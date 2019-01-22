@@ -69,6 +69,7 @@ public class AutonomousTest extends LinearOpMode
         boolean test_PID_walk = false;
         boolean test_cul = false;
         boolean test_range = false;
+        boolean test_simple_walk = false;
 
         if (test_gyro){
             while (opModeIsActive())
@@ -92,6 +93,14 @@ public class AutonomousTest extends LinearOpMode
             sleep(3 * cnst);
 
             PID_walk(-5);
+        }
+
+        if (test_simple_walk){
+            simple_walk(5);
+
+            sleep(3 * cnst);
+
+            simple_walk(-5);
         }
 
         if (test_cul){
@@ -152,6 +161,7 @@ public class AutonomousTest extends LinearOpMode
 
          //modific unghil momentat cu angle
          //cred ca am pb cand sare la minus sau cacaturi dinastea
+
          double start = gyro.getHeading();
 
          double pGain = 0.3 ;
@@ -224,9 +234,9 @@ public class AutonomousTest extends LinearOpMode
 
      private void PID_walk (double walk){
 
-        //merge walk cm (daca e cu minus in spate , altfel in fata)
+         //merge walk cm (daca e cu minus in spate , altfel in fata)
 
-        double start = range_right.getDistance(DistanceUnit.CM);
+         double start = range_right.getDistance(DistanceUnit.CM);
 
          double pGain = 0.3 ;
          double iGain = 0.2;
