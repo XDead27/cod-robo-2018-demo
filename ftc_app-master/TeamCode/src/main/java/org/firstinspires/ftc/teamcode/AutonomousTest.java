@@ -237,36 +237,29 @@ public class AutonomousTest extends LinearOpMode
 
         while (abs(start - now) < abs(walk)){
             now = range_right.getDistance(DistanceUnit.CM);
-            gyro.getIntegratedZValue();
             // TODO adauga o variabila pentru a seta gradul la care se considera devierea
             // TODO daca trece peste 90 de grade sa se apeleze functia rotate ??
             // o ia la STANGA
-            if (gyro > 270 && gyro <= 300) {
+            if (gyro.getHeading() > 270 && gyro.getHeading() <= 300) {
                 mers_right.setPower(0.2 * dir);
-                gyro.getIntegratedZValue();
             }
-            if (gyro > 300 && gyro <= 330) {
+            if (gyro.getHeading() > 300 && gyro.getHeading() <= 330) {
                 mers_right.setPower(0.3 * dir);
-                gyro.getIntegratedZValue();
             }
-            if (gyro > 330 && gyro <= 359) {
+            if (gyro.getHeading() > 330 && gyro.getHeading() <= 359) {
                 mers_right.setPower(0.4 * dir);
-                gyro.getIntegratedZValue();
             }
             // o ia la DREAPTA
-            if (gyro < 90 && gyro >= 60) {
+            if (gyro.getHeading() < 90 && gyro.getHeading() >= 60) {
                 mers_left.setPower(0.2 * dir);
-                gyro.getIntegratedZValue();
             }
-            if (gyro < 60 && gyro >= 30) {
+            if (gyro.getHeading() < 60 && gyro.getHeading() >= 30) {
                 mers_left.setPower(0.3 * dir);
-                gyro.getIntegratedZValue();
             }
-            if (gyro < 30 && gyro >= 1) {
+            if (gyro.getHeading() < 30 && gyro.getHeading() >= 1) {
                 mers_left.setPower(0.4 * dir);
-                gyro.getIntegratedZValue();
             }
-            if (gyro == 0) {
+            if (gyro.getHeading() == 0) {
                 mers_left.setPower(0.5 * dir);
                 mers_right.setPower(0.5 * dir);
             }
