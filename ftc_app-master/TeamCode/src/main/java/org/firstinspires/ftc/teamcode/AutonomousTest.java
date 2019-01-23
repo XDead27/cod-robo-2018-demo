@@ -9,6 +9,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
+import static java.lang.Math.abs;
+import static java.lang.Math.min;
+import static java.lang.Math.max;
 
 @Autonomous(name = "Autonomous_test", group = "Autonomous")
 
@@ -16,8 +19,12 @@ public class AutonomousTest extends LinearOpMode
 {
 
     //motoare
-    private DcMotor LeftMotors = null;
-    private DcMotor RightMotors = null;
+    private DcMotor mers_left = null;
+    private DcMotor mers_right = null;
+    private DcMotor glisare = null;
+    private DcMotor ridicare_cutie = null;
+    private DcMotor ridicare_perii = null;
+    private DcMotor rotire_perii = null;
 
     //senzori
     //private GyroSensor gyro = null;
@@ -64,7 +71,7 @@ public class AutonomousTest extends LinearOpMode
 
         //---------------------------------------------------------------------------
 
-        boolean test_gyro = false;
+        boolean test_gyro = true;
         boolean test_PID_angle = false;
         boolean test_PID_walk = false;
         boolean test_cul = false;
@@ -131,8 +138,8 @@ public class AutonomousTest extends LinearOpMode
     private void initialise()
     {
         //mapare
-        LeftMotors = hardwareMap.dcMotor.get("LeftMotors");
-        RightMotors = hardwareMap.dcMotor.get("RightMotors");
+        mers_left = hardwareMap.dcMotor.get("mers_left");
+        mers_right = hardwareMap.dcMotor.get("mers_right");
 
         //senzori
         //gyro = hardwareMap.gyroSensor.get("gyro");
@@ -142,12 +149,12 @@ public class AutonomousTest extends LinearOpMode
         color = hardwareMap.get(ModernRoboticsI2cColorSensor.class , "color");
 
         //setare puteri la 0
-        LeftMotors.setPower(0);
-        RightMotors.setPower(0);
+        mers_left.setPower(0);
+        mers_right.setPower(0);
 
         //setare directii
-        LeftMotors.setDirection(DcMotorSimple.Direction.FORWARD);
-        RightMotors.setDirection(DcMotorSimple.Direction.REVERSE);
+        mers_left.setDirection(DcMotorSimple.Direction.FORWARD);
+        mers_right.setDirection(DcMotorSimple.Direction.REVERSE);
 
         //calibreat gyro
         gyro.calibrate();
@@ -175,11 +182,11 @@ public class AutonomousTest extends LinearOpMode
              double now = gyro.getHeading();
              if (now > 180){
                  now -= 360;
-                 //telemetry.addLine("sa imi bag pula");
-                 //break;
+                 telemetry.addLine("sa imi bag pula");
+                 break;
              }
              double last = error;
-             error = angle - Math.abs(now - start);
+             error = angle - abs(now - start);
              sum += error;
              double derivata = error - last;
 
@@ -190,8 +197,8 @@ public class AutonomousTest extends LinearOpMode
              telemetry.addData("unghi : ", now );
              telemetry.update();
 
-             double absolut = Math.abs(speed);
-             absolut = Math.min(absolut , 0.5);
+             double absolut = abs(speed);
+             absolut = min(absolut , 0.5);
              if (speed < 0){
                  speed = -absolut;
              }
@@ -199,12 +206,12 @@ public class AutonomousTest extends LinearOpMode
                  speed = absolut;
              }
 
-             LeftMotors.setPower(speed);
-             RightMotors.setPower(-speed);
+             mers_left.setPower(speed);
+             mers_right.setPower(-speed);
          }
 
-         LeftMotors.setPower(0);
-         RightMotors.setPower(0);
+         mers_left.setPower(0);
+         mers_right.setPower(0);
      }
 
      private boolean culoare(){
@@ -224,12 +231,12 @@ public class AutonomousTest extends LinearOpMode
             dir = -1;
         }
 
-        LeftMotors.setPower(0.5 * dir);
-        RightMotors.setPower(0.5 * dir);
-        while (Math.abs(start - now) < Math.abs(walk)){
+        mers_left.setPower(0.5 * dir);
+        mers_right.setPower(0.5 * dir);
+        while (abs(start - now) < abs(walk)){
         }
-        LeftMotors.setPower(0);
-        RightMotors.setPower(0);
+        mers_left.setPower(0);
+        mers_right.setPower(0);
     }
 
      private void PID_walk (double walk){
@@ -259,8 +266,8 @@ public class AutonomousTest extends LinearOpMode
              telemetry.addData("dist : ", now );
              telemetry.update();
 
-             double absolut = Math.abs(speed);
-             absolut = Math.min(absolut , 0.5);
+             double absolut = abs(speed);
+             absolut = min(absolut , 0.5);
              if (speed < 0){
                  speed = -absolut;
              }
@@ -268,11 +275,11 @@ public class AutonomousTest extends LinearOpMode
                  speed = absolut;
              }
 
-             LeftMotors.setPower(speed);
-             RightMotors.setPower(speed);
+             mers_left.setPower(speed);
+             mers_right.setPower(speed);
          }
 
-         LeftMotors.setPower(0);
-         RightMotors.setPower(0);
+         mers_left.setPower(0);
+         mers_right.setPower(0);
      }
 }
