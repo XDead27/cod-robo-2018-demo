@@ -140,6 +140,10 @@ public class AutonomousTest extends LinearOpMode
         //mapare
         mers_left = hardwareMap.dcMotor.get("mers_left");
         mers_right = hardwareMap.dcMotor.get("mers_right");
+        glisare = hardwareMap.dcMotor.get("glisare");
+        ridicare_cutie = hardwareMap.dcMotor.get("ridicare_cutie");
+        ridicare_perii = hardwareMap.dcMotor.get("ridicare_perii");
+        rotire_perii = hardwareMap.dcMotor.get("rotire_perii");
 
         //senzori
         //gyro = hardwareMap.gyroSensor.get("gyro");
@@ -151,10 +155,18 @@ public class AutonomousTest extends LinearOpMode
         //setare puteri la 0
         mers_left.setPower(0);
         mers_right.setPower(0);
+        glisare.setPower(0);
+        ridicare_cutie.setPower(0);
+        ridicare_perii.setPower(0);
+        rotire_perii.setPower(0);
 
         //setare directii
         mers_left.setDirection(DcMotorSimple.Direction.FORWARD);
-        mers_right.setDirection(DcMotorSimple.Direction.REVERSE);
+        mers_right.setDirection(DcMotorSimple.Direction.FORWARD);
+        glisare.setDirection(DcMotorSimple.Direction.FORWARD);
+        ridicare_cutie.setDirection(DcMotorSimple.Direction.FORWARD);
+        ridicare_perii.setDirection(DcMotorSimple.Direction.FORWARD);
+        rotire_perii.setDirection(DcMotorSimple.Direction.FORWARD);
 
         //calibreat gyro
         gyro.calibrate();

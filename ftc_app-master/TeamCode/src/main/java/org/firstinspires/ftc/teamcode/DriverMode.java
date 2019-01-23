@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.util.Range;
+
 import org.firstinspires.ftc.robotcontroller.external.samples.SensorMRGyro;
 import org.firstinspires.ftc.robotcontroller.external.samples.SensorMRRangeSensor;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -31,10 +33,10 @@ public class DriverMode extends LinearOpMode
 
     //senzori
     //private GyroSensor gyro = null;
-    private ModernRoboticsI2cGyro gyro = null;
-    private ModernRoboticsI2cRangeSensor range_right = null;
-    private ModernRoboticsI2cRangeSensor range_left = null;
-    private ModernRoboticsI2cColorSensor color = null;
+    //private ModernRoboticsI2cGyro gyro = null;
+    //private ModernRoboticsI2cRangeSensor range_right = null;
+    //private ModernRoboticsI2cRangeSensor range_left = null;
+    //private ModernRoboticsI2cColorSensor color = null;
 
     @Override
     public void runOpMode()
@@ -47,9 +49,6 @@ public class DriverMode extends LinearOpMode
         {
             firstGamepad();
             secondGamepad();
-            telemetry.addData("gyro: ", gyro.isCalibrating() );
-            telemetry.addData("gyro: ", gyro.getHeading() );
-            telemetry.update();
         }
     }
 
@@ -58,62 +57,65 @@ public class DriverMode extends LinearOpMode
         //mapare
         mers_left = hardwareMap.dcMotor.get("mers_left");
         mers_right = hardwareMap.dcMotor.get("mers_right");
+        glisare = hardwareMap.dcMotor.get("glisare");
+        ridicare_cutie = hardwareMap.dcMotor.get("ridicare_cutie");
+        ridicare_perii = hardwareMap.dcMotor.get("ridicare_perii");
+        rotire_perii = hardwareMap.dcMotor.get("rotire_perii");
 
         //senzori
         //gyro = hardwareMap.gyroSensor.get("gyro");
-        gyro = hardwareMap.get(ModernRoboticsI2cGyro.class ,"gyro");
-        range_left = hardwareMap.get(ModernRoboticsI2cRangeSensor.class ,"range_left");
-        range_right = hardwareMap.get(ModernRoboticsI2cRangeSensor.class ,"range_right");
-        color = hardwareMap.get(ModernRoboticsI2cColorSensor.class , "color");
+        //gyro = hardwareMap.get(ModernRoboticsI2cGyro.class ,"gyro");
+        //range_left = hardwareMap.get(ModernRoboticsI2cRangeSensor.class ,"range_left");
+        //range_right = hardwareMap.get(ModernRoboticsI2cRangeSensor.class ,"range_right");
+        //color = hardwareMap.get(ModernRoboticsI2cColorSensor.class , "color");
 
         //setare puteri la 0
         mers_left.setPower(0);
         mers_right.setPower(0);
+        glisare.setPower(0);
+        ridicare_cutie.setPower(0);
+        ridicare_perii.setPower(0);
+        rotire_perii.setPower(0);
 
         //setare directii
-        mers_left.setDirection(DcMotorSimple.Direction.FORWARD);
+        mers_left.setDirection(DcMotorSimple.Direction.REVERSE);
         mers_right.setDirection(DcMotorSimple.Direction.REVERSE);
+        glisare.setDirection(DcMotorSimple.Direction.FORWARD);
+        ridicare_cutie.setDirection(DcMotorSimple.Direction.FORWARD);
+        ridicare_perii.setDirection(DcMotorSimple.Direction.FORWARD);
+        rotire_perii.setDirection(DcMotorSimple.Direction.FORWARD);
 
         //calibreat gyro
-        gyro.calibrate();
+        //gyro.calibrate();
 
         //senzor de culoare
-        color.enableLed(true); //daca ma uit la un : obiect - true ; lumina - false
+        //color.enableLed(true); //daca ma uit la un : obiect - true ; lumina - false
     }
 
     private void firstGamepad()
     {
-        if (gamepad1.left_stick_y > 0.1) mers_left.setPower(min(gamepad1.left_stick_y , 0.9));
-        else mers_left.setPower(0);
-        if (gamepad1.left_stick_y < -0.1) mers_left.setPower(max(gamepad1.left_stick_y , -0.9));
+        if (abs(gamepad1.left_stick_y) > 0.1) mers_left.setPower(Range.clip(gamepad1.left_stick_y, -0.9, 0.9));
         else mers_left.setPower(0);
 
-        if (gamepad1.right_stick_y > 0.1) mers_right.setPower(min(gamepad1.right_stick_y , 0.9));
-        else mers_right.setPower(0);
-        if (gamepad1.right_stick_y < -0.1) mers_right.setPower(max(gamepad1.right_stick_y , -0.9));
+        if (abs(gamepad1.right_stick_y) > 0.1) mers_right.setPower(Range.clip(gamepad1.right_stick_y, -0.9, 0.9));
         else mers_right.setPower(0);
     }
 
     private void secondGamepad()
     {
         if ( gamepad2.dpad_up ) ridicare_cutie.setPower(0.5);
-        else ridicare_cutie.setPower(0);
-        if ( gamepad2.dpad_down ) ridicare_cutie.setPower(-0.5);
+        else if ( gamepad2.dpad_down ) ridicare_cutie.setPower(-0.5);
         else ridicare_cutie.setPower(0);
 
         if ( gamepad2.a ) ridicare_perii.setPower(-0.4);
-        else ridicare_perii.setPower(0);
-        if ( gamepad2.b ) ridicare_perii.setPower(0.4);
+        else if ( gamepad2.b ) ridicare_perii.setPower(0.4);
         else ridicare_perii.setPower(0);
 
         if ( gamepad2.left_bumper ) rotire_perii.setPower(-0.4);
-        else rotire_perii.setPower(0);
-        if ( gamepad2.right_bumper ) rotire_perii.setPower(0.4);
+        else if ( gamepad2.right_bumper ) rotire_perii.setPower(0.4);
         else rotire_perii.setPower(0);
 
-        if (gamepad1.left_stick_y > 0.1) glisare.setPower(min(gamepad1.left_stick_y , 0.9));
-        else mers_left.setPower(0);
-        if (gamepad1.left_stick_y < -0.1) glisare.setPower(max(gamepad1.left_stick_y , -0.9));
-        else mers_left.setPower(0);
+        if (abs(gamepad2.left_stick_y) > 0.1) glisare.setPower(Range.clip(gamepad2.left_stick_y, -0.9, 0.9));
+        else glisare.setPower(0);
      }
 }
