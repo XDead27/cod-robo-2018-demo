@@ -222,6 +222,7 @@ public class AutonomousTest extends LinearOpMode
     private void simple_walk (double walk){
 
         //merge walk cm (daca e cu minus in spate , altfel in fata)
+        gyro.resetZAxisIntegrator();
 
         double start = range_right.getDistance(DistanceUnit.CM);
         double now = range_right.getDistance(DistanceUnit.CM);
@@ -233,7 +234,43 @@ public class AutonomousTest extends LinearOpMode
 
         mers_left.setPower(0.5 * dir);
         mers_right.setPower(0.5 * dir);
+
         while (abs(start - now) < abs(walk)){
+            now = range_right.getDistance(DistanceUnit.CM);
+            gyro.getIntegratedZValue();
+            // TODO adauga o variabila pentru a seta gradul la care se considera devierea
+            // TODO daca trece peste 90 de grade sa se apeleze functia rotate ??
+            // o ia la STANGA
+            if (gyro > 270 && gyro <= 300) {
+                mers_right.setPower(0.2 * dir);
+                gyro.getIntegratedZValue();
+            }
+            if (gyro > 300 && gyro <= 330) {
+                mers_right.setPower(0.3 * dir);
+                gyro.getIntegratedZValue();
+            }
+            if (gyro > 330 && gyro <= 359) {
+                mers_right.setPower(0.4 * dir);
+                gyro.getIntegratedZValue();
+            }
+            // o ia la DREAPTA
+            if (gyro < 90 && gyro >= 60) {
+                mers_left.setPower(0.2 * dir);
+                gyro.getIntegratedZValue();
+            }
+            if (gyro < 60 && gyro >= 30) {
+                mers_left.setPower(0.3 * dir);
+                gyro.getIntegratedZValue();
+            }
+            if (gyro < 30 && gyro >= 1) {
+                mers_left.setPower(0.4 * dir);
+                gyro.getIntegratedZValue();
+            }
+            if (gyro == 0) {
+                mers_left.setPower(0.5 * dir);
+                mers_right.setPower(0.5 * dir);
+            }
+            idle();
         }
         mers_left.setPower(0);
         mers_right.setPower(0);

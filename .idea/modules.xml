@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/cod-robo-2018-demo.iml" filepath="$PROJECT_DIR$/.idea/cod-robo-2018-demo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cod-robo-2018-demo.iml" filepath="$PROJECT_DIR$/cod-robo-2018-demo.iml" />
     </modules>
   </component>
 </project>
