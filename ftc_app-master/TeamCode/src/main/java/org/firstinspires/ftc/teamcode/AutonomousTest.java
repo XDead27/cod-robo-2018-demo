@@ -234,6 +234,7 @@ public class AutonomousTest extends LinearOpMode
     private void simple_walk (double walk){
 
         //merge walk cm (daca e cu minus in spate , altfel in fata)
+        gyro.resetZAxisIntegrator();
 
         double start = range_right.getDistance(DistanceUnit.CM);
         double now = range_right.getDistance(DistanceUnit.CM);
@@ -245,7 +246,36 @@ public class AutonomousTest extends LinearOpMode
 
         mers_left.setPower(0.5 * dir);
         mers_right.setPower(0.5 * dir);
+
         while (abs(start - now) < abs(walk)){
+            now = range_right.getDistance(DistanceUnit.CM);
+            // TODO adauga o variabila pentru a seta gradul la care se considera devierea
+            // TODO daca trece peste 90 de grade sa se apeleze functia rotate ??
+            // o ia la STANGA
+            if (gyro.getHeading() > 270 && gyro.getHeading() <= 300) {
+                mers_right.setPower(0.2 * dir);
+            }
+            if (gyro.getHeading() > 300 && gyro.getHeading() <= 330) {
+                mers_right.setPower(0.3 * dir);
+            }
+            if (gyro.getHeading() > 330 && gyro.getHeading() <= 359) {
+                mers_right.setPower(0.4 * dir);
+            }
+            // o ia la DREAPTA
+            if (gyro.getHeading() < 90 && gyro.getHeading() >= 60) {
+                mers_left.setPower(0.2 * dir);
+            }
+            if (gyro.getHeading() < 60 && gyro.getHeading() >= 30) {
+                mers_left.setPower(0.3 * dir);
+            }
+            if (gyro.getHeading() < 30 && gyro.getHeading() >= 1) {
+                mers_left.setPower(0.4 * dir);
+            }
+            if (gyro.getHeading() == 0) {
+                mers_left.setPower(0.5 * dir);
+                mers_right.setPower(0.5 * dir);
+            }
+            idle();
         }
         mers_left.setPower(0);
         mers_right.setPower(0);
