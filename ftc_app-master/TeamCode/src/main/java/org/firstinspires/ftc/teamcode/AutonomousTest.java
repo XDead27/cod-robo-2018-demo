@@ -8,6 +8,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import com.qualcomm.robotcore.util.Range;
+
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.min;
@@ -27,13 +32,14 @@ public class AutonomousTest extends LinearOpMode
     private DcMotor rotire_perii = null;
 
     //senzori
-    //private GyroSensor gyro = null;
     private ModernRoboticsI2cGyro gyro = null;
     private ModernRoboticsI2cRangeSensor range_right = null;
     private ModernRoboticsI2cRangeSensor range_left = null;
     private ModernRoboticsI2cColorSensor color = null;
 
     int cnst = 1000;
+
+    static private Timer timer;
 
     @Override
     public void runOpMode()
@@ -174,6 +180,46 @@ public class AutonomousTest extends LinearOpMode
         //senzor de culoare
         color.enableLed(true); //daca ma uit la un : obiect - true ; lumina - false
 
+        timer = new Timer();
+
+    }
+
+
+    private void setWheelsPower(double powerleft, double powerright){
+        mers_right.setPower(powerright);
+        mers_left.setPower(powerleft);
+    }
+
+    private void setWheelsPowerWithGyro(double powerleft, double powerright){
+        // TODO adauga o variabila pentru a seta gradul la care se considera devierea
+        // TODO daca trece peste 90 de grade sa se apeleze functia rotate ??
+        // o ia la STANGA
+        if (gyro.getHeading() > 270 && gyro.getHeading() <= 300) {
+            mers_right.setPower(powerright - 0.4);
+        }
+        if (gyro.getHeading() > 300 && gyro.getHeading() <= 330) {
+            mers_right.setPower(powerright - 0.3);
+        }
+        if (gyro.getHeading() > 330 && gyro.getHeading() <= 359) {
+            mers_right.setPower(powerright - 0.2);
+        }
+        // o ia la DREAPTA
+        if (gyro.getHeading() < 90 && gyro.getHeading() >= 60) {
+            mers_left.setPower(powerright - 0.4);
+        }
+        if (gyro.getHeading() < 60 && gyro.getHeading() >= 30) {
+            mers_left.setPower(powerright - 0.3);
+        }
+        if (gyro.getHeading() < 30 && gyro.getHeading() >= 1) {
+            mers_left.setPower(powerright - 0.2);
+        }
+        if (gyro.getHeading() == 0) {
+            setWheelsPower(powerleft, powerright);
+        }
+    }
+
+    private void stopWheels(){
+        setWheelsPower(0, 0);
     }
 
      private void PID_angle (double angle){
@@ -210,7 +256,7 @@ public class AutonomousTest extends LinearOpMode
              telemetry.update();
 
              double absolut = abs(speed);
-             absolut = min(absolut , 0.5);
+             absolut = Range.clip(speed, -0.5, 0.5);
              if (speed < 0){
                  speed = -absolut;
              }
@@ -231,7 +277,7 @@ public class AutonomousTest extends LinearOpMode
         return (cul == 8);
      }
 
-    private void simple_walk (double walk){
+     private void simple_walk (double walk){
 
         //merge walk cm (daca e cu minus in spate , altfel in fata)
         gyro.resetZAxisIntegrator();
@@ -324,4 +370,89 @@ public class AutonomousTest extends LinearOpMode
          mers_left.setPower(0);
          mers_right.setPower(0);
      }
+
+     /*private void walk_with_range(double distanceFromWall, double approxDistance, boolean bHasToBeAllignedWithWall){
+        //se aliniaza cu zidul din fata
+        if(bHasToBeAllignedWithWall){
+            while(Math.abs(range_right.rawUltrasonic() - range_left.rawUltrasonic()) < 10){
+                //TODO: foloseste PID_angle dupa calcularea unghiului
+                int dir = (int)Math.signum(range_right.rawUltrasonic() - range_left.rawUltrasonic());
+                mers_right.setPower(0.2 * dir);
+                mers_left.setPower(-0.2 * dir);
+            }
+        }
+
+        //cat timp e pe loc verifica rapid daca se intrapta ceva spre robot
+         TimerTask checkObstacle = new TimerTask() {
+             double deltaRange_Right;
+             double deltaRange_Left;
+
+             double auxRange_Right = range_right.rawUltrasonic();
+             double auxRange_Left = range_left.rawUltrasonic();
+
+             long startTime = new Date().getTime();
+
+             public void run() {
+                 deltaRange_Right = range_right.rawUltrasonic() - auxRange_Right;
+                 deltaRange_Left = range_left.rawUltrasonic() - auxRange_Left;
+
+                 //daca se gaseste obstacol sau nu se gaseste obstacol pentru 1 secunde atunci iese din task
+                 if(EvitareObstacol(deltaRange_Right, deltaRange_Left) || new Date().getTime() - startTime > 1)
+                     cancel();
+             }
+         };
+
+         long delay  = 0L;
+         long period = 100L; //while ce opereaza la frecventa de 100 ms
+         timer.scheduleAtFixedRate(checkObstacle, delay, period);
+     }*/
+
+     private void walk_with_obstacle_and_range(double distanceFromWall, double approxDistance, boolean bHasToBeAllignedWithWall){
+         //se aliniaza cu zidul din fata
+         if(bHasToBeAllignedWithWall){
+             while(Math.abs(range_right.rawUltrasonic() - range_left.rawUltrasonic()) < 10/*magic number*/){
+                 //TODO: foloseste PID_angle dupa calcularea unghiului
+                 int dir = (int)Math.signum(range_right.rawUltrasonic() - range_left.rawUltrasonic());
+                 mers_right.setPower(0.2 * dir);
+                 mers_left.setPower(-0.2 * dir);
+             }
+         }
+
+         final double target = distanceFromWall;
+
+         TimerTask PIDwalk = new TimerTask() {
+             double shortestDistanceToWall = Math.min(range_left.getDistance(DistanceUnit.CM), range_right.getDistance(DistanceUnit.CM));
+
+             double iGain = 0.2;
+             double pGain = 0.3;
+             double dGain = 0.1;
+
+             //TODO: creaza inca un pid, fiecare sa fie pentru cate un range si respectiva serie de roti
+
+             double error = target - shortestDistanceToWall;
+             double sum = error;
+
+             double aux;
+
+             public void run() {
+                 shortestDistanceToWall = Math.min(range_left.getDistance(DistanceUnit.CM), range_right.getDistance(DistanceUnit.CM));
+
+                 aux = error;
+                 error = target - shortestDistanceToWall;
+                 sum += error;
+
+                 double derivative = error - aux;
+
+                 double speed = (error * pGain) + (sum * iGain) + (derivative * dGain);
+
+                 setWheelsPowerWithGyro(speed, speed);
+
+             }
+         };
+
+         long delay  = 0L;
+         long period = 100L; //while ce opereaza la frecventa de 100 ms
+         timer.scheduleAtFixedRate(PIDwalk, delay, period);
+     }
 }
+
