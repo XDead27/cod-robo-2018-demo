@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import com.qualcomm.robotcore.util.Range;
 
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -371,42 +370,6 @@ public class AutonomousTest extends LinearOpMode
          mers_right.setPower(0);
      }
 
-     /*private void walk_with_range(double distanceFromWall, double approxDistance, boolean bHasToBeAllignedWithWall){
-        //se aliniaza cu zidul din fata
-        if(bHasToBeAllignedWithWall){
-            while(Math.abs(range_right.rawUltrasonic() - range_left.rawUltrasonic()) < 10){
-                //TODO: foloseste PID_angle dupa calcularea unghiului
-                int dir = (int)Math.signum(range_right.rawUltrasonic() - range_left.rawUltrasonic());
-                mers_right.setPower(0.2 * dir);
-                mers_left.setPower(-0.2 * dir);
-            }
-        }
-
-        //cat timp e pe loc verifica rapid daca se intrapta ceva spre robot
-         TimerTask checkObstacle = new TimerTask() {
-             double deltaRange_Right;
-             double deltaRange_Left;
-
-             double auxRange_Right = range_right.rawUltrasonic();
-             double auxRange_Left = range_left.rawUltrasonic();
-
-             long startTime = new Date().getTime();
-
-             public void run() {
-                 deltaRange_Right = range_right.rawUltrasonic() - auxRange_Right;
-                 deltaRange_Left = range_left.rawUltrasonic() - auxRange_Left;
-
-                 //daca se gaseste obstacol sau nu se gaseste obstacol pentru 1 secunde atunci iese din task
-                 if(EvitareObstacol(deltaRange_Right, deltaRange_Left) || new Date().getTime() - startTime > 1)
-                     cancel();
-             }
-         };
-
-         long delay  = 0L;
-         long period = 100L; //while ce opereaza la frecventa de 100 ms
-         timer.scheduleAtFixedRate(checkObstacle, delay, period);
-     }*/
-
      private void walk_with_obstacle_and_range(double distanceFromWall, double approxDistance, boolean bHasToBeAllignedWithWall){
          //se aliniaza cu zidul din fata
          if(bHasToBeAllignedWithWall){
@@ -419,40 +382,63 @@ public class AutonomousTest extends LinearOpMode
          }
 
          final double target = distanceFromWall;
+         long delay  = 0L;
+         final long period = 100L; //while ce opereaza la frecventa de 100 ms
 
          TimerTask PIDwalk = new TimerTask() {
-             double shortestDistanceToWall = Math.min(range_left.getDistance(DistanceUnit.CM), range_right.getDistance(DistanceUnit.CM));
 
-             double iGain = 0.2;
-             double pGain = 0.3;
+             double steadyTimer = 0;
+
+             double iGain = 0.2; //TODO: incearca sa setezi la 0 sa vedem daca se rezolva doar cu PD control
+             double pGain = 1/target; //daca zidul sau alt robot se apropie mai mult decat trebuie atunci sa mearga la viteza maxima in spate
              double dGain = 0.1;
 
-             //TODO: creaza inca un pid, fiecare sa fie pentru cate un range si respectiva serie de roti
+             double errorRight = target - range_right.getDistance(DistanceUnit.CM);
+             double errorLeft = target - range_left.getDistance(DistanceUnit.CM);
 
-             double error = target - shortestDistanceToWall;
-             double sum = error;
+             double sumRight = errorRight;
+             double sumLeft = errorLeft;
 
-             double aux;
+             double auxRight;
+             double auxLeft;
 
              public void run() {
-                 shortestDistanceToWall = Math.min(range_left.getDistance(DistanceUnit.CM), range_right.getDistance(DistanceUnit.CM));
 
-                 aux = error;
-                 error = target - shortestDistanceToWall;
-                 sum += error;
+                 if(Math.abs(errorLeft) < 5 || Math.abs(errorRight) < 5){
+                     steadyTimer += period;
+                 }else{
+                     steadyTimer = 0;
+                 }
 
-                 double derivative = error - aux;
+                 auxRight = errorRight;
+                 auxLeft = errorLeft;
+                 errorRight = target - range_right.getDistance(DistanceUnit.CM);
+                 errorLeft = target - range_left.getDistance(DistanceUnit.CM);
+                 sumRight += errorRight;
+                 sumLeft += errorLeft;
 
-                 double speed = (error * pGain) + (sum * iGain) + (derivative * dGain);
+                 double derivativeRight = errorRight - auxRight;
+                 double derivativeLeft = errorLeft - auxLeft;
 
-                 setWheelsPowerWithGyro(speed, speed);
+                 double speedRight = (errorRight * pGain) + (sumRight * iGain) + (derivativeRight * dGain);
+                 double speedLeft = (errorLeft * pGain) + (sumLeft * iGain) + (derivativeLeft * dGain);
+
+                 //inversam viteza ca sa fie pozitiva
+                 speedRight = Range.clip(-speedRight, -1, 1);
+                 speedLeft = Range.clip(-speedLeft, -1, 1);
+
+                 setWheelsPowerWithGyro(speedLeft, speedRight);
+
+                 if(steadyTimer > 1000){
+                     cancel();
+                 }
 
              }
          };
 
-         long delay  = 0L;
-         long period = 100L; //while ce opereaza la frecventa de 100 ms
          timer.scheduleAtFixedRate(PIDwalk, delay, period);
+
+         stopWheels();
      }
 }
 
