@@ -76,9 +76,10 @@ public class AutonomousTest extends LinearOpMode
         //---------------------------------------------------------------------------
 
         boolean test_rotit = false;
-        boolean test_mers = true;
+        boolean test_mers = false;
 
         boolean test_senz = false;
+        boolean test_mers_culoare = true;
 
         if (test_senz){
             while (opModeIsActive())
@@ -110,6 +111,10 @@ public class AutonomousTest extends LinearOpMode
             mers(30);
             sleep (3 * cnst);
             mers(70);
+        }
+
+        if (test_mers_culoare){
+            mers_culoare();
         }
     }
 
@@ -158,6 +163,9 @@ public class AutonomousTest extends LinearOpMode
     }
 
     private void rotit (double angle){
+        if (angle <= 1){
+            return;
+        }
         double end = gyro.getHeading() + angle;
         while (end < 0){
             end += 360;
@@ -192,7 +200,8 @@ public class AutonomousTest extends LinearOpMode
         mers_right.setPower(0);
     }
 
-    private void mers (double end){
+    private void mers (double pasi){
+        double end = range_left.rawUltrasonic() - pasi;
         double speed = 0.5;
         if (range_left.rawUltrasonic() - end < 0){
             speed = -speed;
@@ -200,18 +209,18 @@ public class AutonomousTest extends LinearOpMode
         mers_left.setPower(speed);
         mers_right.setPower(speed);
         while (abs(range_left.rawUltrasonic() - end) > 5 && opModeIsActive()){
-            telemetry.addData("dist mers : " , range_left.rawUltrasonic());
-            telemetry.update();
         }
+        mers_left.setPower(0);
+        mers_right.setPower(0);
         mers_delicat(end , speed);
     }
 
     private void mers_delicat (double end , double speed){
         if (speed > 0){
-            speed = 0.3;
+            speed = 0.15;
         }
         else{
-            speed = -0.3;
+            speed = -0.15;
         }
         mers_left.setPower(speed);
         mers_right.setPower(speed);
@@ -223,9 +232,50 @@ public class AutonomousTest extends LinearOpMode
         mers_right.setPower(0);
     }
 
+    private void mers_cul (){
+        double speed = 0.135;
+        mers_left.setPower(speed);
+        mers_right.setPower(speed);
+        while (color.readUnsignedByte(ModernRoboticsI2cColorSensor.Register.COLOR_NUMBER) == 0){
+        }
+        mers_left.setPower(0);
+        mers_right.setPower(0);
+    }
+
      private boolean culoare(){
         int cul = color.readUnsignedByte(ModernRoboticsI2cColorSensor.Register.COLOR_NUMBER);
-        return (cul == 9 || cul == 10);
+        return (cul == 8 || cul == 9 || cul == 10);
+     }
+
+     private boolean etapa (double angle) {
+        rotit(angle);
+        double start = range_left.rawUltrasonic();
+        mers_cul();
+        double end = range_left.rawUltrasonic();
+        boolean ok = false;
+        if (culoare()) {
+            mers(5);
+            mers(-5);
+            ok = true;
+        }
+        telemetry.addData("start : " , start);
+        telemetry.addData("end : " , end);
+        telemetry.update();
+        mers(end - start);
+        rotit(-angle);
+        return ok;
+     }
+
+     private void mers_culoare() {
+         if (etapa(0)) {
+             return;
+         }
+         /*if (etapa(-20)) {
+             return;
+         }
+         if (etapa(20)) {
+             return;
+         }*/
      }
 
 
