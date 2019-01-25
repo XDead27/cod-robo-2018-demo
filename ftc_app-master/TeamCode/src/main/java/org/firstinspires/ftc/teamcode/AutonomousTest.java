@@ -192,7 +192,36 @@ public class AutonomousTest extends LinearOpMode
     private void setWheelsPowerWithGyro(double powerleft, double powerright){
         // TODO adauga o variabila pentru a seta gradul la care se considera devierea
         // TODO daca trece peste 90 de grade sa se apeleze functia rotate ??
-        // o ia la STANGA
+        gyro.resetZAxisIntegrator();
+        double pGain = 0.3;
+        double iGain = 0.2;
+        double dGain = 0.1;
+
+        double error = gyro.getHeading();
+        double sum = 0;
+
+        while (error > 3 || error < 357)
+        {
+            double now = gyro.getHeading();
+            double last = gyro.getHeading();
+
+            sum += error;
+            double derivata = last - now;
+
+            double speed = (error * pGain) + (sum * iGain) + (derivata * dGain);
+            if (error < 180)
+            {
+                setWheelsPower(speed, powerright);
+            }
+            else if (error > 180)
+            {
+                setWheelsPower(powerleft, speed);
+            }
+        }
+
+
+
+        /*// o ia la STANGA
         if (gyro.getHeading() > 270 && gyro.getHeading() <= 300) {
             mers_right.setPower(powerright - 0.4);
         }
@@ -214,7 +243,7 @@ public class AutonomousTest extends LinearOpMode
         }
         if (gyro.getHeading() == 0) {
             setWheelsPower(powerleft, powerright);
-        }
+        }*/
     }
 
     private void stopWheels(){
@@ -235,12 +264,12 @@ public class AutonomousTest extends LinearOpMode
          double error = angle;
          double sum = angle;
 
-         while (error > 1 || error < 1){
+         while (error > 1 || error < -1){
              double now = gyro.getHeading();
              if (now > 180){
                  now -= 360;
-                 telemetry.addLine("sa imi bag pula");
-                 break;
+                 //telemetry.addLine("sa imi bag pula");
+                 //break;
              }
              double last = error;
              error = angle - abs(now - start);
@@ -254,14 +283,7 @@ public class AutonomousTest extends LinearOpMode
              telemetry.addData("unghi : ", now );
              telemetry.update();
 
-             double absolut = abs(speed);
-             absolut = Range.clip(speed, -0.5, 0.5);
-             if (speed < 0){
-                 speed = -absolut;
-             }
-             else{
-                 speed = absolut;
-             }
+             speed = Range.clip(speed, -0.5, 0.5);
 
              mers_left.setPower(speed);
              mers_right.setPower(-speed);
@@ -332,7 +354,7 @@ public class AutonomousTest extends LinearOpMode
 
          double start = range_right.getDistance(DistanceUnit.CM);
 
-         double pGain = 0.3 ;
+         double pGain = 0.3;
          double iGain = 0.2;
          double dGain = 0.1;
 
