@@ -37,6 +37,7 @@ public class AutonomousTest extends LinearOpMode
     private ModernRoboticsI2cColorSensor color = null;
 
     int cnst = 1000;
+    static double TOLERANCE = 0.0001;
 
     static private Timer timer;
 
@@ -76,7 +77,7 @@ public class AutonomousTest extends LinearOpMode
 
         //---------------------------------------------------------------------------
 
-        boolean test_gyro = true;
+        boolean test_gyro = false;
         boolean test_PID_angle = false;
         boolean test_PID_walk = false;
         boolean test_cul = false;
@@ -138,6 +139,8 @@ public class AutonomousTest extends LinearOpMode
             }
         }
 
+
+        walk_with_obstacle_and_range(20, 20000, false);
     }
 
     private void initialise()
@@ -382,16 +385,16 @@ public class AutonomousTest extends LinearOpMode
          }
 
          final double target = distanceFromWall;
-         long delay  = 0L;
+         /*long delay  = 0L;
          final long period = 100L; //while ce opereaza la frecventa de 100 ms
 
          TimerTask PIDwalk = new TimerTask() {
 
              double steadyTimer = 0;
 
-             double iGain = 0.2; //TODO: incearca sa setezi la 0 sa vedem daca se rezolva doar cu PD control
+             double iGain = 0.0; //TODO: incearca sa setezi la 0 sa vedem daca se rezolva doar cu PD control
              double pGain = 1/target; //daca zidul sau alt robot se apropie mai mult decat trebuie atunci sa mearga la viteza maxima in spate
-             double dGain = 0.1;
+             double dGain = 0.0;
 
              double errorRight = target - range_right.getDistance(DistanceUnit.CM);
              double errorLeft = target - range_left.getDistance(DistanceUnit.CM);
@@ -427,7 +430,9 @@ public class AutonomousTest extends LinearOpMode
                  speedRight = Range.clip(-speedRight, -1, 1);
                  speedLeft = Range.clip(-speedLeft, -1, 1);
 
-                 setWheelsPowerWithGyro(speedLeft, speedRight);
+                 //setWheelsPowerWithGyro(speedLeft, speedRight);
+
+                 setWheelsPower(speedLeft,speedRight);
 
                  if(steadyTimer > 1000){
                      cancel();
@@ -436,8 +441,65 @@ public class AutonomousTest extends LinearOpMode
              }
          };
 
-         timer.scheduleAtFixedRate(PIDwalk, delay, period);
+         timer.scheduleAtFixedRate(PIDwalk, delay, period);*/
 
+         ///TEST**************
+         double iGain = 0.0; //TODO: incearca sa setezi la 0 sa vedem daca se rezolva doar cu PD control
+         double pGain = 1/target; //daca zidul sau alt robot se apropie mai mult decat trebuie atunci sa mearga la viteza maxima in spate
+         double dGain = 0.0;
+
+         double errorRight = target - range_right.getDistance(DistanceUnit.CM);
+         double errorLeft = target - range_left.getDistance(DistanceUnit.CM);
+
+         double sumRight = errorRight;
+         double sumLeft = errorLeft;
+
+         double auxRight;
+         double auxLeft;
+
+         while(opModeIsActive()){
+
+             auxRight = errorRight;
+             auxLeft = errorLeft;
+             errorRight = target - range_right.getDistance(DistanceUnit.CM);
+             errorLeft = target - range_left.getDistance(DistanceUnit.CM);
+             sumRight += errorRight;
+             sumLeft += errorLeft;
+
+             double derivativeRight = errorRight - auxRight;
+             double derivativeLeft = errorLeft - auxLeft;
+
+             double speedRight = (errorRight * pGain)/* + (sumRight * iGain) + (derivativeRight * dGain)*/;
+             double speedLeft = (errorLeft * pGain)/* + (sumLeft * iGain) + (derivativeLeft * dGain)*/;
+
+             //inversam viteza ca sa fie pozitiva
+             speedLeft = -speedLeft;
+             speedRight = -speedRight;
+
+             speedRight = Range.clip(speedRight, -0.9, 0.9);
+             speedLeft = Range.clip(speedLeft, -0.9, 0.9);
+
+             if(Math.abs(speedLeft) < TOLERANCE ){
+                speedLeft = 0;
+             }
+             if(Math.abs(speedRight) < TOLERANCE ){
+                 speedRight = 0;
+             }
+
+
+             setWheelsPower(speedLeft,speedRight);
+
+             telemetry.addData("speed left", speedLeft);
+             telemetry.addData("speed right", speedRight);
+
+             telemetry.addData("error left ", errorLeft);
+             telemetry.addData("error right ", errorRight);
+             telemetry.addData("range left ", range_left.getDistance(DistanceUnit.CM));
+             telemetry.addData("range right ", range_right.getDistance(DistanceUnit.CM));
+             telemetry.update();
+         }
+
+         ///TEST END*****************
          stopWheels();
      }
 }
