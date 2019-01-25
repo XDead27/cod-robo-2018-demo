@@ -7,6 +7,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.GyroSensor;
+import com.qualcomm.robotcore.hardware.I2cAddr;
+
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import static java.lang.Math.abs;
@@ -71,16 +74,31 @@ public class AutonomousTest extends LinearOpMode
 
         //---------------------------------------------------------------------------
 
-        boolean test_gyro = true;
+        boolean test_gyro = false;
         boolean test_PID_angle = false;
         boolean test_PID_walk = false;
         boolean test_cul = false;
-        boolean test_range = false;
+        boolean test_range = true;
         boolean test_simple_walk = false;
+
+        boolean test_senz = false;
+
+        if (test_senz){
+            while (opModeIsActive())
+            {
+                telemetry.addData("distanta dreapta : " , range_right.rawUltrasonic());
+                telemetry.addData("distanta stanga : " , range_left.rawUltrasonic());
+                telemetry.addData ("culoare : " , color.readUnsignedByte(ModernRoboticsI2cColorSensor.Register.COLOR_NUMBER));
+                telemetry.addData ("calibrat : " , gyro.isCalibrating());
+                telemetry.addData ("unghi : " , gyro.getHeading());
+                telemetry.update();
+            }
+        }
 
         if (test_gyro){
             while (opModeIsActive())
             {
+                telemetry.addData ("calibrat : " , gyro.isCalibrating());
                 telemetry.addData ("unghi : " , gyro.getHeading());
                 telemetry.update();
             }
@@ -161,8 +179,8 @@ public class AutonomousTest extends LinearOpMode
         rotire_perii.setPower(0);
 
         //setare directii
-        mers_left.setDirection(DcMotorSimple.Direction.FORWARD);
-        mers_right.setDirection(DcMotorSimple.Direction.FORWARD);
+        mers_left.setDirection(DcMotorSimple.Direction.REVERSE);
+        mers_right.setDirection(DcMotorSimple.Direction.REVERSE);
         glisare.setDirection(DcMotorSimple.Direction.FORWARD);
         ridicare_cutie.setDirection(DcMotorSimple.Direction.FORWARD);
         ridicare_perii.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -275,7 +293,6 @@ public class AutonomousTest extends LinearOpMode
                 mers_left.setPower(0.5 * dir);
                 mers_right.setPower(0.5 * dir);
             }
-            idle();
         }
         mers_left.setPower(0);
         mers_right.setPower(0);
