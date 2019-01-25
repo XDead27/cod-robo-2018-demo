@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.hardware.I2cAddr;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
@@ -74,12 +75,8 @@ public class AutonomousTest extends LinearOpMode
 
         //---------------------------------------------------------------------------
 
-        boolean test_gyro = false;
-        boolean test_PID_angle = false;
-        boolean test_PID_walk = false;
-        boolean test_cul = false;
-        boolean test_range = true;
-        boolean test_simple_walk = false;
+        boolean test_rotit = false;
+        boolean test_mers = true;
 
         boolean test_senz = false;
 
@@ -95,62 +92,25 @@ public class AutonomousTest extends LinearOpMode
             }
         }
 
-        if (test_gyro){
-            while (opModeIsActive())
-            {
-                telemetry.addData ("calibrat : " , gyro.isCalibrating());
-                telemetry.addData ("unghi : " , gyro.getHeading());
-                telemetry.update();
-            }
+        if (test_rotit){
+            rotit (90);
+            sleep (3 * cnst);
+            rotit (-90);
+            sleep (3 * cnst);
+            rotit (180);
+            sleep (3 * cnst);
+            rotit (-180);
         }
 
-        if (test_PID_angle){
-            PID_angle(90.0);
-
-            sleep(3 * cnst);
-
-            PID_angle(-90.0);
+        if (test_mers){
+            mers(50);
+            sleep (3 * cnst);
+            mers(100);
+            sleep (3 * cnst);
+            mers(30);
+            sleep (3 * cnst);
+            mers(70);
         }
-
-        if (test_PID_walk){
-            PID_walk(5);
-
-            sleep(3 * cnst);
-
-            PID_walk(-5);
-        }
-
-        if (test_simple_walk){
-            simple_walk(5);
-
-            sleep(3 * cnst);
-
-            simple_walk(-5);
-        }
-
-        if (test_cul){
-            while (opModeIsActive())
-            {
-                telemetry.addData ("culoare : " , color.readUnsignedByte(ModernRoboticsI2cColorSensor.Register.COLOR_NUMBER));
-                telemetry.update();
-            }
-        }
-
-        if (test_range){
-            while (opModeIsActive())
-            {
-                telemetry.addData ("left ultrasonic : " , range_left.rawUltrasonic());
-                telemetry.addData ("left optical : " , range_left.rawOptical());
-                telemetry.addData ("left cm : " , range_left.getDistance(DistanceUnit.CM));
-
-                telemetry.addData ("right ultrasonic : " , range_right.rawUltrasonic());
-                telemetry.addData ("right optical : " , range_right.rawOptical());
-                telemetry.addData ("right cm : " , range_right.getDistance(DistanceUnit.CM));
-
-                telemetry.update();
-            }
-        }
-
     }
 
     private void initialise()
@@ -179,8 +139,8 @@ public class AutonomousTest extends LinearOpMode
         rotire_perii.setPower(0);
 
         //setare directii
-        mers_left.setDirection(DcMotorSimple.Direction.REVERSE);
-        mers_right.setDirection(DcMotorSimple.Direction.REVERSE);
+        mers_left.setDirection(DcMotorSimple.Direction.FORWARD);
+        mers_right.setDirection(DcMotorSimple.Direction.FORWARD);
         glisare.setDirection(DcMotorSimple.Direction.FORWARD);
         ridicare_cutie.setDirection(DcMotorSimple.Direction.FORWARD);
         ridicare_perii.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -188,157 +148,85 @@ public class AutonomousTest extends LinearOpMode
 
         //calibreat gyro
         gyro.calibrate();
+        while (gyro.isCalibrating()){
+            idle();
+        }
 
         //senzor de culoare
         color.enableLed(true); //daca ma uit la un : obiect - true ; lumina - false
 
     }
 
-     private void PID_angle (double angle){
-
-         //modific unghil momentat cu angle
-         //cred ca am pb cand sare la minus sau cacaturi dinastea
-
-         double start = gyro.getHeading();
-
-         double pGain = 0.3 ;
-         double iGain = 0.2;
-         double dGain = 0.1;
-
-         double error = angle;
-         double sum = angle;
-
-         while (error > 1 || error < 1){
-             double now = gyro.getHeading();
-             if (now > 180){
-                 now -= 360;
-                 telemetry.addLine("sa imi bag pula");
-                 break;
-             }
-             double last = error;
-             error = angle - abs(now - start);
-             sum += error;
-             double derivata = error - last;
-
-             double speed = (error * pGain) + (sum * iGain) + (derivata * dGain);
-
-             telemetry.addData("speed : ", speed );
-             telemetry.addData("error : ", error );
-             telemetry.addData("unghi : ", now );
-             telemetry.update();
-
-             double absolut = abs(speed);
-             absolut = min(absolut , 0.5);
-             if (speed < 0){
-                 speed = -absolut;
-             }
-             else{
-                 speed = absolut;
-             }
-
-             mers_left.setPower(speed);
-             mers_right.setPower(-speed);
-         }
-
-         mers_left.setPower(0);
-         mers_right.setPower(0);
-     }
-
-     private boolean culoare(){
-        int cul = color.readUnsignedByte(ModernRoboticsI2cColorSensor.Register.COLOR_NUMBER);
-        return (cul == 8);
-     }
-
-    private void simple_walk (double walk){
-
-        //merge walk cm (daca e cu minus in spate , altfel in fata)
-        gyro.resetZAxisIntegrator();
-
-        double start = range_right.getDistance(DistanceUnit.CM);
-        double now = range_right.getDistance(DistanceUnit.CM);
-
-        int dir = 1;
-        if (walk < 0){
-            dir = -1;
+    private void rotit (double angle){
+        double end = gyro.getHeading() + angle;
+        while (end < 0){
+            end += 360;
         }
+        double speed = 0.5;
+        if (angle < 0){
+            speed = -speed;
+        }
+        mers_left.setPower(speed);
+        mers_right.setPower(-speed);
+        while (abs(gyro.getHeading() - end) > 5 && opModeIsActive()){
+            telemetry.addData("angle rotit : " , gyro.getHeading());
+            telemetry.update();
+        }
+        rotit_delicat(end , speed);
+    }
 
-        mers_left.setPower(0.5 * dir);
-        mers_right.setPower(0.5 * dir);
-
-        while (abs(start - now) < abs(walk)){
-            now = range_right.getDistance(DistanceUnit.CM);
-            // TODO adauga o variabila pentru a seta gradul la care se considera devierea
-            // TODO daca trece peste 90 de grade sa se apeleze functia rotate ??
-            // o ia la STANGA
-            if (gyro.getHeading() > 270 && gyro.getHeading() <= 300) {
-                mers_right.setPower(0.2 * dir);
-            }
-            if (gyro.getHeading() > 300 && gyro.getHeading() <= 330) {
-                mers_right.setPower(0.3 * dir);
-            }
-            if (gyro.getHeading() > 330 && gyro.getHeading() <= 359) {
-                mers_right.setPower(0.4 * dir);
-            }
-            // o ia la DREAPTA
-            if (gyro.getHeading() < 90 && gyro.getHeading() >= 60) {
-                mers_left.setPower(0.2 * dir);
-            }
-            if (gyro.getHeading() < 60 && gyro.getHeading() >= 30) {
-                mers_left.setPower(0.3 * dir);
-            }
-            if (gyro.getHeading() < 30 && gyro.getHeading() >= 1) {
-                mers_left.setPower(0.4 * dir);
-            }
-            if (gyro.getHeading() == 0) {
-                mers_left.setPower(0.5 * dir);
-                mers_right.setPower(0.5 * dir);
-            }
+    private void rotit_delicat (double end , double speed){
+        if (speed > 0){
+            speed = 0.3;
+        }
+        else{
+            speed = -0.3;
+        }
+        mers_left.setPower(speed);
+        mers_right.setPower(-speed);
+        while (abs(gyro.getHeading() - end) > 1 && opModeIsActive()){
+            telemetry.addData("angle delicat : " , gyro.getHeading());
+            telemetry.update();
         }
         mers_left.setPower(0);
         mers_right.setPower(0);
     }
 
-     private void PID_walk (double walk){
+    private void mers (double end){
+        double speed = 0.5;
+        if (range_left.rawUltrasonic() - end < 0){
+            speed = -speed;
+        }
+        mers_left.setPower(speed);
+        mers_right.setPower(speed);
+        while (abs(range_left.rawUltrasonic() - end) > 5 && opModeIsActive()){
+            telemetry.addData("dist mers : " , range_left.rawUltrasonic());
+            telemetry.update();
+        }
+        mers_delicat(end , speed);
+    }
 
-         //merge walk cm (daca e cu minus in spate , altfel in fata)
+    private void mers_delicat (double end , double speed){
+        if (speed > 0){
+            speed = 0.3;
+        }
+        else{
+            speed = -0.3;
+        }
+        mers_left.setPower(speed);
+        mers_right.setPower(speed);
+        while (abs(range_left.rawUltrasonic() - end) > 1 && opModeIsActive()){
+            telemetry.addData("dist delicat : " , range_left.rawUltrasonic());
+            telemetry.update();
+        }
+        mers_left.setPower(0);
+        mers_right.setPower(0);
+    }
 
-         double start = range_right.getDistance(DistanceUnit.CM);
-
-         double pGain = 0.3 ;
-         double iGain = 0.2;
-         double dGain = 0.1;
-
-         double error = walk;
-         double sum = walk;
-
-         while (error > 0.1 || error < 0.1){
-             double now = range_right.getDistance(DistanceUnit.CM);
-             double last = error;
-             error = walk - (now-start);
-             sum += error;
-             double derivata = error - last;
-
-             double speed = (error * pGain) + (sum * iGain) + (derivata * dGain);
-
-             telemetry.addData("speed : ", speed );
-             telemetry.addData("error : ", error );
-             telemetry.addData("dist : ", now );
-             telemetry.update();
-
-             double absolut = abs(speed);
-             absolut = min(absolut , 0.5);
-             if (speed < 0){
-                 speed = -absolut;
-             }
-             else{
-                 speed = absolut;
-             }
-
-             mers_left.setPower(speed);
-             mers_right.setPower(speed);
-         }
-
-         mers_left.setPower(0);
-         mers_right.setPower(0);
+     private boolean culoare(){
+        int cul = color.readUnsignedByte(ModernRoboticsI2cColorSensor.Register.COLOR_NUMBER);
+        return (cul == 9 || cul == 10);
      }
+
+
 }
