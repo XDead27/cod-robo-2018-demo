@@ -308,31 +308,7 @@ public class AutonomousTest extends LinearOpMode
 
      private void simple_walk (double walk){
 
-        //merge walk cm (daca e cu minus in spate , altfel in fata)
-        /*gyro.resetZAxisIntegrator();
 
-        double start = range_right.getDistance(DistanceUnit.CM);
-        double now = range_right.getDistance(DistanceUnit.CM);
-
-        int dir = 1;
-        if (walk < 0){
-            dir = -1;
-        }
-        double end = gyro.getHeading() + angle;
-        while (end < 0){
-            end += 360;
-        }
-        double speed = 0.5;
-        if (angle < 0){
-            speed = -speed;
-        }
-        mers_left.setPower(speed);
-        mers_right.setPower(-speed);
-        while (abs(gyro.getHeading() - end) > 5 && opModeIsActive()){
-            telemetry.addData("angle rotit : " , gyro.getHeading());
-            telemetry.update();
-        }
-        rotit_delicat(end , speed);*/
     }
 
     private void rotit_delicat (double end , double speed){
@@ -479,6 +455,7 @@ public class AutonomousTest extends LinearOpMode
              speedRight = (errorRight * pGain);
              speedLeft = (errorLeft * pGain);
 
+             //TODO: Rezolva asta in cct
              double derivativeRight = Math.abs(speedRight - auxRight);
              double derivativeLeft = Math.abs(speedLeft - auxLeft);
 
@@ -522,5 +499,8 @@ public class AutonomousTest extends LinearOpMode
          ///TEST END*****************
          stopWheels();
      }
+
+     //TODO: adauga functie de calculare a unghiului in functie de distanta parcursa
+
 }
 
