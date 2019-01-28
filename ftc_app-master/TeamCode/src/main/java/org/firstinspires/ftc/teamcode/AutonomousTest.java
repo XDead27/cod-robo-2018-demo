@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.os.Handler;
+
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cColorSensor;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
@@ -86,7 +88,7 @@ public class AutonomousTest extends LinearOpMode
         boolean test_mers = false;
 
         boolean test_senz = false;
-        boolean test_mers_culoare = true;
+        boolean test_mers_culoare = false;
 
         boolean test_gyro = false;
         boolean test_PID_angle = false;
@@ -436,67 +438,13 @@ public class AutonomousTest extends LinearOpMode
          }
 
          final double target = distanceFromWall;
-         /*long delay  = 0L;
-         final long period = 100L; //while ce opereaza la frecventa de 100 ms
+         final double delay  = 2000;
+         final long period = 10L; //while ce opereaza la frecventa de 10 ms
 
-         TimerTask PIDwalk = new TimerTask() {
-
-             double steadyTimer = 0;
-
-             double iGain = 0.0; //TODO: incearca sa setezi la 0 sa vedem daca se rezolva doar cu PD control
-             double pGain = 1/target; //daca zidul sau alt robot se apropie mai mult decat trebuie atunci sa mearga la viteza maxima in spate
-             double dGain = 0.0;
-
-             double errorRight = target - range_right.getDistance(DistanceUnit.CM);
-             double errorLeft = target - range_left.getDistance(DistanceUnit.CM);
-
-             double sumRight = errorRight;
-             double sumLeft = errorLeft;
-
-             double auxRight;
-             double auxLeft;
-
-             public void run() {
-
-                 if(Math.abs(errorLeft) < 5 || Math.abs(errorRight) < 5){
-                     steadyTimer += period;
-                 }else{
-                     steadyTimer = 0;
-                 }
-
-                 auxRight = errorRight;
-                 auxLeft = errorLeft;
-                 errorRight = target - range_right.getDistance(DistanceUnit.CM);
-                 errorLeft = target - range_left.getDistance(DistanceUnit.CM);
-                 sumRight += errorRight;
-                 sumLeft += errorLeft;
-
-                 double derivativeRight = errorRight - auxRight;
-                 double derivativeLeft = errorLeft - auxLeft;
-
-                 double speedRight = (errorRight * pGain) + (sumRight * iGain) + (derivativeRight * dGain);
-                 double speedLeft = (errorLeft * pGain) + (sumLeft * iGain) + (derivativeLeft * dGain);
-
-                 //inversam viteza ca sa fie pozitiva
-                 speedRight = Range.clip(-speedRight, -1, 1);
-                 speedLeft = Range.clip(-speedLeft, -1, 1);
-
-                 //setWheelsPowerWithGyro(speedLeft, speedRight);
-
-                 setWheelsPower(speedLeft,speedRight);
-
-                 if(steadyTimer > 1000){
-                     cancel();
-                 }
-
-             }
-         };
-
-         timer.scheduleAtFixedRate(PIDwalk, delay, period);*/
 
          ///TEST**************
          double iGain = 0.0; //TODO: incearca sa setezi la 0 sa vedem daca se rezolva doar cu PD control
-         double pGain = 1/target; //daca zidul sau alt robot se apropie mai mult decat trebuie atunci sa mearga la viteza maxima in spate
+         double pGain = 1/(target - 5); //daca zidul sau alt robot se apropie mai mult decat trebuie atunci sa mearga la viteza maxima in spate
          double dGain = 0.0;
 
          double errorRight = target - range_right.getDistance(DistanceUnit.CM);
@@ -505,23 +453,41 @@ public class AutonomousTest extends LinearOpMode
          double sumRight = errorRight;
          double sumLeft = errorLeft;
 
+         double speedLeft = 0;
+         double speedRight = 0;
+
          double auxRight;
          double auxLeft;
 
-         while(opModeIsActive()){
+         float steadyTimer = 0;
 
-             auxRight = errorRight;
-             auxLeft = errorLeft;
+         while(opModeIsActive() && steadyTimer < delay){
+
+             if (Math.abs(errorLeft) < 2 || Math.abs(errorRight) < 2) {
+                 steadyTimer += period;
+             } else {
+                 steadyTimer = 0;
+             }
+
+             auxRight = speedRight;
+             auxLeft = speedLeft;
              errorRight = target - range_right.getDistance(DistanceUnit.CM);
              errorLeft = target - range_left.getDistance(DistanceUnit.CM);
              sumRight += errorRight;
              sumLeft += errorLeft;
 
-             double derivativeRight = errorRight - auxRight;
-             double derivativeLeft = errorLeft - auxLeft;
+             speedRight = (errorRight * pGain);
+             speedLeft = (errorLeft * pGain);
 
-             double speedRight = (errorRight * pGain)/* + (sumRight * iGain) + (derivativeRight * dGain)*/;
-             double speedLeft = (errorLeft * pGain)/* + (sumLeft * iGain) + (derivativeLeft * dGain)*/;
+             double derivativeRight = Math.abs(speedRight - auxRight);
+             double derivativeLeft = Math.abs(speedLeft - auxLeft);
+
+             if(derivativeRight > 0.4){
+                 speedRight = speedRight*(1-derivativeRight); //formula pentru crestere incrementala
+             }
+             if(derivativeLeft > 0.4){
+                 speedLeft = speedLeft*(1-derivativeLeft);
+             }
 
              //inversam viteza ca sa fie pozitiva
              speedLeft = -speedLeft;
@@ -547,7 +513,10 @@ public class AutonomousTest extends LinearOpMode
              telemetry.addData("error right ", errorRight);
              telemetry.addData("range left ", range_left.getDistance(DistanceUnit.CM));
              telemetry.addData("range right ", range_right.getDistance(DistanceUnit.CM));
+             telemetry.addData("steady timer ", steadyTimer);
              telemetry.update();
+
+             sleep(period);
          }
 
          ///TEST END*****************
