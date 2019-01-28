@@ -81,20 +81,20 @@ public class AutonomousTest extends LinearOpMode
 
         //---------------------------------------------------------------------------
 
-<<<<<<< HEAD
+
         boolean test_rotit = false;
         boolean test_mers = false;
 
         boolean test_senz = false;
         boolean test_mers_culoare = true;
-=======
+
         boolean test_gyro = false;
         boolean test_PID_angle = false;
         boolean test_PID_walk = false;
         boolean test_cul = false;
         boolean test_range = false;
         boolean test_simple_walk = false;
->>>>>>> Test_Obstacol
+
 
         if (test_senz){
             while (opModeIsActive())
@@ -131,8 +131,6 @@ public class AutonomousTest extends LinearOpMode
         if (test_mers_culoare){
             mers_culoare();
         }
-<<<<<<< HEAD
-=======
 
         if (test_cul){
             while (opModeIsActive())
@@ -159,7 +157,6 @@ public class AutonomousTest extends LinearOpMode
 
 
         walk_with_obstacle_and_range(20, 20000, false);
->>>>>>> Test_Obstacol
     }
 
     private void initialise()
@@ -246,11 +243,12 @@ public class AutonomousTest extends LinearOpMode
         setWheelsPower(0, 0);
     }
 
-<<<<<<< HEAD
-    private void rotit (double angle){
-        if (angle <= 1){
+
+    private void rotit (double angle) {
+        if (angle <= 1) {
             return;
-=======
+        }
+    }
      private void PID_angle (double angle){
 
          //modific unghil momentat cu angle
@@ -309,7 +307,7 @@ public class AutonomousTest extends LinearOpMode
      private void simple_walk (double walk){
 
         //merge walk cm (daca e cu minus in spate , altfel in fata)
-        gyro.resetZAxisIntegrator();
+        /*gyro.resetZAxisIntegrator();
 
         double start = range_right.getDistance(DistanceUnit.CM);
         double now = range_right.getDistance(DistanceUnit.CM);
@@ -317,7 +315,6 @@ public class AutonomousTest extends LinearOpMode
         int dir = 1;
         if (walk < 0){
             dir = -1;
->>>>>>> Test_Obstacol
         }
         double end = gyro.getHeading() + angle;
         while (end < 0){
@@ -333,7 +330,7 @@ public class AutonomousTest extends LinearOpMode
             telemetry.addData("angle rotit : " , gyro.getHeading());
             telemetry.update();
         }
-        rotit_delicat(end , speed);
+        rotit_delicat(end , speed);*/
     }
 
     private void rotit_delicat (double end , double speed){
@@ -395,11 +392,6 @@ public class AutonomousTest extends LinearOpMode
         mers_right.setPower(0);
     }
 
-     private boolean culoare(){
-        int cul = color.readUnsignedByte(ModernRoboticsI2cColorSensor.Register.COLOR_NUMBER);
-        return (cul == 8 || cul == 9 || cul == 10);
-     }
-
      private boolean etapa (double angle) {
         rotit(angle);
         double start = range_left.rawUltrasonic();
@@ -431,10 +423,7 @@ public class AutonomousTest extends LinearOpMode
          }*/
      }
 
-<<<<<<< HEAD
 
-}
-=======
      private void walk_with_obstacle_and_range(double distanceFromWall, double approxDistance, boolean bHasToBeAllignedWithWall){
          //se aliniaza cu zidul din fata
          if(bHasToBeAllignedWithWall){
@@ -566,4 +555,3 @@ public class AutonomousTest extends LinearOpMode
      }
 }
 
->>>>>>> Test_Obstacol
