@@ -506,10 +506,10 @@ public class AutonomousTest extends LinearOpMode
              //****************************
              //retrack
              if(bIsUsingEncoder){
-                 if(initValueL < mers_left.getCurrentPosition()){
+                 if(initValueL <= mers_left.getCurrentPosition()){
                      finalSpeedLeft = 0;
                  }
-                 if(initValueR < mers_right.getCurrentPosition()){
+                 if(initValueR <= mers_right.getCurrentPosition()){
                      finalSpeedRight = 0;
                  }
 
