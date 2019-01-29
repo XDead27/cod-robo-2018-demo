@@ -18,25 +18,25 @@ import com.qualcomm.robotcore.util.Range;
 
 import java.util.Timer;
 import java.util.TimerTask;
+=======
+>>>>>>> postu_enache
 
 import static java.lang.Math.abs;
-import static java.lang.Math.min;
-import static java.lang.Math.max;
 
 @Autonomous(name = "Autonomous_test", group = "Autonomous")
 
-public class AutonomousTest extends LinearOpMode
-{
+public class AutonomousTest extends LinearOpMode {
 
     //motoare
-    private DcMotor mers_left = null;
-    private DcMotor mers_right = null;
-    private DcMotor glisare = null;
-    private DcMotor ridicare_cutie = null;
-    private DcMotor ridicare_perii = null;
-    private DcMotor rotire_perii = null;
+    protected DcMotor mers_left = null;
+    protected DcMotor mers_right = null;
+    protected DcMotor glisare = null;
+    protected DcMotor ridicare_cutie = null;
+    protected DcMotor ridicare_perii = null;
+    protected DcMotor rotire_perii = null;
 
     //senzori
+<<<<<<< HEAD
     private ModernRoboticsI2cGyro gyro = null;
     private ModernRoboticsI2cRangeSensor range_right = null;
     private ModernRoboticsI2cRangeSensor range_left = null;
@@ -47,14 +47,23 @@ public class AutonomousTest extends LinearOpMode
     protected static double DISTANCE_BETWEEN_SLOTS = 30;
 
     static private Timer timer;
+=======
+    protected ModernRoboticsI2cGyro gyro = null;
+    protected ModernRoboticsI2cRangeSensor range_right = null;
+    protected ModernRoboticsI2cRangeSensor range_left = null;
+    protected ModernRoboticsI2cColorSensor color = null;
+
+    final int const_sleep = 1000;
+    final int const_encoder = 67;
+>>>>>>> postu_enache
 
     @Override
-    public void runOpMode()
-    {
+    public void runOpMode() {
         initialise();
 
         waitForStart();
 
+<<<<<<< HEAD
         //crater simplu :
 
         //ma misc in fata pana ajung pe linia obiectelor
@@ -134,36 +143,64 @@ public class AutonomousTest extends LinearOpMode
         if (test_mers_culoare){
             mers_culoare();
         }
+=======
+        boolean test_rotit = false;
+        boolean test_mers_encoder = false;
 
-        if (test_cul){
-            while (opModeIsActive())
-            {
-                telemetry.addData ("culoare : " , color.readUnsignedByte(ModernRoboticsI2cColorSensor.Register.COLOR_NUMBER));
+        boolean test_senz = false;
+        boolean test_mers_culoare = true;
+
+        if (test_senz) {
+            while (opModeIsActive()) {
+                telemetry.addData("distanta dreapta : ", range_right.rawUltrasonic());
+                telemetry.addData("distanta stanga : ", range_left.rawUltrasonic());
+                telemetry.addData("culoare : ", color.readUnsignedByte(ModernRoboticsI2cColorSensor.Register.COLOR_NUMBER));
+                telemetry.addData("calibrat : ", gyro.isCalibrating());
+                telemetry.addData("unghi : ", gyro.getHeading());
                 telemetry.update();
             }
         }
 
-        if (test_range){
-            while (opModeIsActive())
-            {
-                telemetry.addData ("left ultrasonic : " , range_left.rawUltrasonic());
-                telemetry.addData ("left optical : " , range_left.rawOptical());
-                telemetry.addData ("left cm : " , range_left.getDistance(DistanceUnit.CM));
-
-                telemetry.addData ("right ultrasonic : " , range_right.rawUltrasonic());
-                telemetry.addData ("right optical : " , range_right.rawOptical());
-                telemetry.addData ("right cm : " , range_right.getDistance(DistanceUnit.CM));
-
-                telemetry.update();
-            }
+        if (test_rotit) {
+            rotit(90);
+            sleep(3 * const_sleep);
+            rotit(-90);
+            sleep(3 * const_sleep);
+            rotit(180);
+            sleep(3 * const_sleep);
+            rotit(-180);
+            sleep(3 * const_sleep);
+            rotit(20);
+            sleep(3 * const_sleep);
+            rotit(-20);
         }
+
+        if (test_mers_encoder) {
+            mers_encoder(50 * const_encoder);
+            sleep(3 * const_sleep);
+
+            mers_encoder(-100 * const_encoder);
+            sleep(3 * const_sleep);
+
+            mers_encoder(30 * const_encoder);
+            sleep(3 * const_sleep);
+>>>>>>> postu_enache
+
+            mers_encoder(-70 * const_encoder);
+        }
+
+        if (test_mers_culoare) {
+            mers_culoare();
+        }
+<<<<<<< HEAD
 
 
         walk_with_obstacle_and_range(20, 20000, false);
+=======
+>>>>>>> postu_enache
     }
 
-    private void initialise()
-    {
+    protected void initialise() {
         //mapare
         mers_left = hardwareMap.dcMotor.get("mers_left");
         mers_right = hardwareMap.dcMotor.get("mers_right");
@@ -174,10 +211,10 @@ public class AutonomousTest extends LinearOpMode
 
         //senzori
         //gyro = hardwareMap.gyroSensor.get("gyro");
-        gyro = hardwareMap.get(ModernRoboticsI2cGyro.class ,"gyro");
-        range_left = hardwareMap.get(ModernRoboticsI2cRangeSensor.class ,"range_left");
-        range_right = hardwareMap.get(ModernRoboticsI2cRangeSensor.class ,"range_right");
-        color = hardwareMap.get(ModernRoboticsI2cColorSensor.class , "color");
+        gyro = hardwareMap.get(ModernRoboticsI2cGyro.class, "gyro");
+        range_left = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "range_left");
+        range_right = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "range_right");
+        color = hardwareMap.get(ModernRoboticsI2cColorSensor.class, "color");
 
         //setare puteri la 0
         mers_left.setPower(0);
@@ -195,14 +232,22 @@ public class AutonomousTest extends LinearOpMode
         ridicare_perii.setDirection(DcMotorSimple.Direction.FORWARD);
         rotire_perii.setDirection(DcMotorSimple.Direction.FORWARD);
 
+        mers_left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        mers_right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         //calibreat gyro
         gyro.calibrate();
+<<<<<<< HEAD
         while (gyro.isCalibrating()){
+=======
+        while (gyro.isCalibrating()) {
+>>>>>>> postu_enache
             idle();
         }
 
         //senzor de culoare
         color.enableLed(true); //daca ma uit la un : obiect - true ; lumina - false
+<<<<<<< HEAD
 
         timer = new Timer();
 
@@ -338,12 +383,47 @@ public class AutonomousTest extends LinearOpMode
         mers_left.setPower(speed);
         mers_right.setPower(speed);
         while (abs(range_left.rawUltrasonic() - end) > 5 && opModeIsActive()){
+=======
+    }
+
+    private void rotit(double angle) {
+        if (abs(angle) <= 1) {
+            return;
+        }
+        double end = gyro.getHeading() + angle;
+        while (end < 0) {
+            end += 360;
+        }
+        double speed = 0.6;
+        if (angle < 0) {
+            speed = -speed;
+        }
+        mers_left.setPower(-speed);
+        mers_right.setPower(speed);
+        while (abs(gyro.getHeading() - end) > 5 && opModeIsActive()) {
+            idle();
+        }
+        rotit_delicat(end, speed);
+    }
+
+    protected void rotit_delicat(double end, double speed) {
+        if (speed > 0) {
+            speed = 0.2;
+        } else {
+            speed = -0.2;
+        }
+        mers_left.setPower(-speed);
+        mers_right.setPower(speed);
+        while (abs(gyro.getHeading() - end) > 1 && opModeIsActive()) {
+            idle();
+>>>>>>> postu_enache
         }
         mers_left.setPower(0);
         mers_right.setPower(0);
         mers_delicat(end , speed);
     }
 
+<<<<<<< HEAD
     private void mers_delicat (double end , double speed){
         if (speed > 0){
             speed = 0.15;
@@ -548,3 +628,113 @@ public class AutonomousTest extends LinearOpMode
 
 }
 
+=======
+    /*protected void mers_ultrasonic (double pasi){
+        //cu pasi unde mai multe -> pasi poz se duce in spate , pasi neg in fata
+        double end = range_left.rawUltrasonic() + pasi;
+        double speed = 0.3;
+        if (pasi > 0){
+            speed = -speed;
+        }
+        mers_left.setPower(speed);
+        mers_right.setPower(speed);
+        while (abs(range_left.rawUltrasonic() - end) > 5 && opModeIsActive()){
+        }
+        //mers_left.setPower(0);
+        //mers_right.setPower(0);
+        mers_delicat_ultrasonic(end , speed);
+    }
+
+    protected void mers_delicat_ultrasonic (double end , double speed){
+        if (speed > 0){
+            speed = 0.15;
+        }
+        else{
+            speed = -0.15;
+        }
+        mers_left.setPower(speed);
+        mers_right.setPower(speed);
+        while (abs(range_left.rawUltrasonic() - end) > 1 && opModeIsActive()){
+            telemetry.addData("dist delicat : " , range_left.rawUltrasonic());
+            telemetry.update();
+        }
+        mers_left.setPower(0);
+        mers_right.setPower(0);
+    }*/
+
+    protected void mers_encoder(int pasi) {
+        if (abs(pasi) > 0) {
+            mers_left.setTargetPosition(mers_left.getCurrentPosition() + pasi * const_encoder);
+            mers_right.setTargetPosition(mers_right.getCurrentPosition() + pasi * const_encoder);
+        }
+        mers_left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        mers_left.setPower(0.7);
+        mers_right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        mers_right.setPower(0.7);
+        while (mers_left.isBusy() || mers_right.isBusy()) {
+            idle();
+        }
+        mers_left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        mers_left.setPower(0);
+        mers_right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        mers_right.setPower(0);
+    }
+
+    protected void mers_cul() {
+        double speed = 0.2;
+        mers_left.setPower(speed);
+        mers_right.setPower(speed);
+        while (color.readUnsignedByte(ModernRoboticsI2cColorSensor.Register.COLOR_NUMBER) == 0 && opModeIsActive()) {
+            idle();
+        }
+        mers_left.setPower(0);
+        mers_right.setPower(0);
+    }
+
+    protected boolean culoare() {
+        int cul = color.readUnsignedByte(ModernRoboticsI2cColorSensor.Register.COLOR_NUMBER);
+        return (cul == 8 || cul == 9 || cul == 10);
+    }
+
+    private boolean etapa(double angle) {
+        rotit(angle);
+        int sl = mers_left.getCurrentPosition();
+        int sr = mers_right.getCurrentPosition();
+        mers_encoder(25);
+        mers_cul();
+        boolean ok = false;
+        if (culoare()) {
+            mers_encoder(5);
+            mers_encoder(-5);
+            ok = true;
+        }
+        mers_left.setTargetPosition(sl);
+        mers_right.setTargetPosition(sr);
+        mers_encoder(0);
+        rotit(-angle);
+        return ok;
+    }
+
+    protected void mers_culoare() {
+        if (etapa(0)) {
+            mers_left.setPower(0);
+            mers_right.setPower(0);
+            return;
+        }
+        sleep(300);
+        if (etapa(-28)) {
+            mers_left.setPower(0);
+            mers_right.setPower(0);
+            return;
+        }
+        sleep(300);
+        if (etapa(28)) {
+            mers_left.setPower(0);
+            mers_right.setPower(0);
+            return;
+        }
+    }
+
+}
+
+>>>>>>> postu_enache
