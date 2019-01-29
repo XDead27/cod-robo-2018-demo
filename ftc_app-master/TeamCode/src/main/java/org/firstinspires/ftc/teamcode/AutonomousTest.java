@@ -23,7 +23,7 @@ public abstract class AutonomousTest extends AutonomousMode {
         boolean test_senz = false;
         boolean test_rotit = false;
         boolean test_mers_encoder = false;
-        boolean test_gasit_cub_si_intors = false;
+        boolean test_gasit_cub = false;
         boolean test_optimizare = false;
 
         if (test_senz) {
@@ -64,8 +64,8 @@ public abstract class AutonomousTest extends AutonomousMode {
             mers_encoder(-70 * const_encoder);
         }
 
-        if (test_gasit_cub_si_intors) {
-            gasit_cub_si_intors();
+        if (test_gasit_cub) {
+            gasit_cub(false);
         }
 
         if (test_optimizare){
