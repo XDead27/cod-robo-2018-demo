@@ -43,7 +43,8 @@ public class AutonomousTest extends LinearOpMode
     private ModernRoboticsI2cColorSensor color = null;
 
     int cnst = 1000;
-    static double TOLERANCE = 0.0001;
+    protected static double TOLERANCE = 0.0001;
+    protected static double DISTANCE_BETWEEN_SLOTS = 30;
 
     static private Timer timer;
 
@@ -417,6 +418,11 @@ public class AutonomousTest extends LinearOpMode
          final double delay  = 2000;
          final long period = 10L; //while ce opereaza la frecventa de 10 ms
 
+         boolean bIsUsingEncoder = false;
+
+         ///IMPLEMENTARE GYRO
+         gyro.resetZAxisIntegrator();
+         double currentHeading = gyro.getHeading();
 
          ///TEST**************
          double iGain = 0.0; //TODO: incearca sa setezi la 0 sa vedem daca se rezolva doar cu PD control
@@ -429,67 +435,101 @@ public class AutonomousTest extends LinearOpMode
          double sumRight = errorRight;
          double sumLeft = errorLeft;
 
-         double speedLeft = 0;
-         double speedRight = 0;
+         double proportionalSpeedLeft = 0;
+         double proportionalSpeedRight = 0;
 
-         double auxRight;
-         double auxLeft;
+         double derivativeSpeedLeft, finalSpeedLeft = 0, derivativeSpeedRight, finalSpeedRight = 0;
+
+         double auxRight, auxLeft, initValueL = 0, initValueR = 0;
 
          float steadyTimer = 0;
 
          while(opModeIsActive() && steadyTimer < delay){
 
+             //*****************************
+             //conditia de timer
              if (Math.abs(errorLeft) < 2 || Math.abs(errorRight) < 2) {
                  steadyTimer += period;
              } else {
                  steadyTimer = 0;
              }
 
-             auxRight = speedRight;
-             auxLeft = speedLeft;
+
+             //****************************
+             //PID
+             auxRight = finalSpeedRight;
+             auxLeft = finalSpeedLeft;
              errorRight = target - range_right.getDistance(DistanceUnit.CM);
              errorLeft = target - range_left.getDistance(DistanceUnit.CM);
              sumRight += errorRight;
              sumLeft += errorLeft;
 
-             speedRight = (errorRight * pGain);
-             speedLeft = (errorLeft * pGain);
-
-             //TODO: Rezolva asta in cct
-             double derivativeRight = Math.abs(speedRight - auxRight);
-             double derivativeLeft = Math.abs(speedLeft - auxLeft);
-
-             if(derivativeRight > 0.4){
-                 speedRight = speedRight*(1-derivativeRight); //formula pentru crestere incrementala
-             }
-             if(derivativeLeft > 0.4){
-                 speedLeft = speedLeft*(1-derivativeLeft);
-             }
+             proportionalSpeedRight = (errorRight * pGain);
+             proportionalSpeedLeft = (errorLeft * pGain);
 
              //inversam viteza ca sa fie pozitiva
-             speedLeft = -speedLeft;
-             speedRight = -speedRight;
+             finalSpeedLeft = -proportionalSpeedLeft;
+             finalSpeedRight = -proportionalSpeedRight;
 
-             speedRight = Range.clip(speedRight, -0.9, 0.9);
-             speedLeft = Range.clip(speedLeft, -0.9, 0.9);
+             finalSpeedLeft = Range.clip(finalSpeedLeft, -0.9, 0.9);
+             finalSpeedRight = Range.clip(finalSpeedRight, -0.9, 0.9);
 
-             if(Math.abs(speedLeft) < TOLERANCE ){
-                speedLeft = 0;
+             //****************************
+             //exceptii
+             if(Math.abs(finalSpeedLeft) < TOLERANCE ){
+                finalSpeedLeft = 0;
              }
-             if(Math.abs(speedRight) < TOLERANCE ){
-                 speedRight = 0;
+             if(Math.abs(finalSpeedRight) < TOLERANCE ){
+                 finalSpeedRight = 0;
              }
 
+             //daca robotul trebuie sa se intoarca
+             if(finalSpeedLeft > 0 && finalSpeedRight < 0){
+                 finalSpeedLeft = 0;
+             }
+             if(finalSpeedRight > 0 && finalSpeedLeft < 0){
+                 finalSpeedRight = 0;
+             }
 
-             setWheelsPower(speedLeft,speedRight);
+             //****************************
+             //gyro
+             currentHeading = gyro.getHeading();
+             if(currentHeading > 180){
+                 currentHeading = currentHeading - 360;
+             }
+             if(Math.abs(currentHeading) > 2 && !bIsUsingEncoder){
+                 bIsUsingEncoder = true;
+                 initValueL = mers_left.getCurrentPosition();
+                 initValueR = mers_right.getCurrentPosition();
+             }
 
-             telemetry.addData("speed left", speedLeft);
-             telemetry.addData("speed right", speedRight);
+             //****************************
+             //retrack
+             if(bIsUsingEncoder){
+                 if(initValueL < mers_left.getCurrentPosition()){
+                     finalSpeedLeft = 0;
+                 }
+                 if(initValueR < mers_right.getCurrentPosition()){
+                     finalSpeedRight = 0;
+                 }
+
+                 if(initValueL < mers_left.getCurrentPosition() && initValueR < mers_right.getCurrentPosition()){
+                     bIsUsingEncoder = false;
+                     gyro.resetZAxisIntegrator();
+                 }
+             }
+
+             setWheelsPower(finalSpeedLeft,finalSpeedRight);
+
+             telemetry.addData("using encoder ", bIsUsingEncoder);
+
+             //telemetry.addData("desired ", -proportionalSpeedRight);
+
+             telemetry.addData("speed left", finalSpeedLeft);
+             telemetry.addData("speed right", finalSpeedRight);
 
              telemetry.addData("error left ", errorLeft);
              telemetry.addData("error right ", errorRight);
-             telemetry.addData("range left ", range_left.getDistance(DistanceUnit.CM));
-             telemetry.addData("range right ", range_right.getDistance(DistanceUnit.CM));
              telemetry.addData("steady timer ", steadyTimer);
              telemetry.update();
 
@@ -501,6 +541,10 @@ public class AutonomousTest extends LinearOpMode
      }
 
      //TODO: adauga functie de calculare a unghiului in functie de distanta parcursa
+     protected double calculateTurnAngle(double encoderTicks){
+        return Math.atan(DISTANCE_BETWEEN_SLOTS / (encoderTicks / 67));
+     }
+
 
 }
 
