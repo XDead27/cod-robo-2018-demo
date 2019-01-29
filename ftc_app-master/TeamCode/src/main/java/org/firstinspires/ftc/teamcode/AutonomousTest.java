@@ -9,23 +9,17 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.GyroSensor;
-import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import com.qualcomm.robotcore.util.Range;
-
-import java.util.Timer;
-import java.util.TimerTask;
-=======
->>>>>>> postu_enache
 
 import static java.lang.Math.abs;
 
-@Autonomous(name = "Autonomous_test", group = "Autonomous")
+public abstract class AutonomousTest extends LinearOpMode {
 
-public class AutonomousTest extends LinearOpMode {
+    ///********************************
+    //Variables
+    ///********************************
 
     //motoare
     protected DcMotor mers_left = null;
@@ -36,169 +30,39 @@ public class AutonomousTest extends LinearOpMode {
     protected DcMotor rotire_perii = null;
 
     //senzori
-<<<<<<< HEAD
     private ModernRoboticsI2cGyro gyro = null;
     private ModernRoboticsI2cRangeSensor range_right = null;
     private ModernRoboticsI2cRangeSensor range_left = null;
     private ModernRoboticsI2cColorSensor color = null;
 
+    //constante
     int cnst = 1000;
     protected static double TOLERANCE = 0.0001;
     protected static double DISTANCE_BETWEEN_SLOTS = 30;
-
-    static private Timer timer;
-=======
-    protected ModernRoboticsI2cGyro gyro = null;
-    protected ModernRoboticsI2cRangeSensor range_right = null;
-    protected ModernRoboticsI2cRangeSensor range_left = null;
-    protected ModernRoboticsI2cColorSensor color = null;
-
     final int const_sleep = 1000;
     final int const_encoder = 67;
->>>>>>> postu_enache
+
+    //misc
+    boolean bHasFoundCube;
 
     @Override
     public void runOpMode() {
         initialise();
 
-        waitForStart();
+        runOp();
 
-<<<<<<< HEAD
-        //crater simplu :
-
-        //ma misc in fata pana ajung pe linia obiectelor
-        //ma intorc ca sa fiu paralel cu obiectele
-        //dau in spate pana la ultimul obiect
-        //verific
-        //merg pana la al doilea
-        //verific
-        //merg pana la al treilea
-        //verific
-        //cand gasesc cul == galben fac 90 grade , merg in fata si ma opresc pe crater
-
-        //--------------------------------------------------------------------------
-
-        //crater cu optimizare :
-
-        //ma misc in fata pana ajung pe linia obiectelor
-        //ma intorc ca sa fiu paralel cu obiectele
-        //dau in spate pana la ultimul obiect
-        //verific
-        //merg pana la al doilea
-        //verific
-        //merg pana la al treilea
-        //verific
-        //cand gasesc cul == galben fac 90 , un fata spate , -90
-        //ma duc pana la perete si ma pun paralel si ma pun pe crater
-
-        //---------------------------------------------------------------------------
-
-
-        boolean test_rotit = false;
-        boolean test_mers = false;
-
-        boolean test_senz = false;
-        boolean test_mers_culoare = false;
-
-        boolean test_gyro = false;
-        boolean test_PID_angle = false;
-        boolean test_PID_walk = false;
-        boolean test_cul = false;
-        boolean test_range = false;
-        boolean test_simple_walk = false;
-
-
-        if (test_senz){
-            while (opModeIsActive())
-            {
-                telemetry.addData("distanta dreapta : " , range_right.rawUltrasonic());
-                telemetry.addData("distanta stanga : " , range_left.rawUltrasonic());
-                telemetry.addData ("culoare : " , color.readUnsignedByte(ModernRoboticsI2cColorSensor.Register.COLOR_NUMBER));
-                telemetry.addData ("calibrat : " , gyro.isCalibrating());
-                telemetry.addData ("unghi : " , gyro.getHeading());
-                telemetry.update();
-            }
-        }
-
-        if (test_rotit){
-            rotit (90);
-            sleep (3 * cnst);
-            rotit (-90);
-            sleep (3 * cnst);
-            rotit (180);
-            sleep (3 * cnst);
-            rotit (-180);
-        }
-
-        if (test_mers){
-            mers(50);
-            sleep (3 * cnst);
-            mers(100);
-            sleep (3 * cnst);
-            mers(30);
-            sleep (3 * cnst);
-            mers(70);
-        }
-
-        if (test_mers_culoare){
-            mers_culoare();
-        }
-=======
-        boolean test_rotit = false;
-        boolean test_mers_encoder = false;
-
-        boolean test_senz = false;
-        boolean test_mers_culoare = true;
-
-        if (test_senz) {
-            while (opModeIsActive()) {
-                telemetry.addData("distanta dreapta : ", range_right.rawUltrasonic());
-                telemetry.addData("distanta stanga : ", range_left.rawUltrasonic());
-                telemetry.addData("culoare : ", color.readUnsignedByte(ModernRoboticsI2cColorSensor.Register.COLOR_NUMBER));
-                telemetry.addData("calibrat : ", gyro.isCalibrating());
-                telemetry.addData("unghi : ", gyro.getHeading());
-                telemetry.update();
-            }
-        }
-
-        if (test_rotit) {
-            rotit(90);
-            sleep(3 * const_sleep);
-            rotit(-90);
-            sleep(3 * const_sleep);
-            rotit(180);
-            sleep(3 * const_sleep);
-            rotit(-180);
-            sleep(3 * const_sleep);
-            rotit(20);
-            sleep(3 * const_sleep);
-            rotit(-20);
-        }
-
-        if (test_mers_encoder) {
-            mers_encoder(50 * const_encoder);
-            sleep(3 * const_sleep);
-
-            mers_encoder(-100 * const_encoder);
-            sleep(3 * const_sleep);
-
-            mers_encoder(30 * const_encoder);
-            sleep(3 * const_sleep);
->>>>>>> postu_enache
-
-            mers_encoder(-70 * const_encoder);
-        }
-
-        if (test_mers_culoare) {
-            mers_culoare();
-        }
-<<<<<<< HEAD
-
-
-        walk_with_obstacle_and_range(20, 20000, false);
-=======
->>>>>>> postu_enache
+        endOp();
     }
+
+    ///********************************
+    //FUNCTII
+    ///********************************
+
+    protected abstract void runOp();
+    protected abstract void endOp();
+
+    //TODO: adaugati comentarii
+
 
     protected void initialise() {
         //mapare
@@ -237,19 +101,13 @@ public class AutonomousTest extends LinearOpMode {
 
         //calibreat gyro
         gyro.calibrate();
-<<<<<<< HEAD
-        while (gyro.isCalibrating()){
-=======
+
         while (gyro.isCalibrating()) {
->>>>>>> postu_enache
             idle();
         }
 
         //senzor de culoare
         color.enableLed(true); //daca ma uit la un : obiect - true ; lumina - false
-<<<<<<< HEAD
-
-        timer = new Timer();
 
     }
 
@@ -259,6 +117,7 @@ public class AutonomousTest extends LinearOpMode {
         mers_left.setPower(powerleft);
     }
 
+    //nefolosita
     private void setWheelsPowerWithGyro(double powerleft, double powerright){
         // TODO adauga o variabila pentru a seta gradul la care se considera devierea
         // TODO daca trece peste 90 de grade sa se apeleze functia rotate ??
@@ -287,23 +146,18 @@ public class AutonomousTest extends LinearOpMode {
         }
     }
 
+
     private void stopWheels(){
         setWheelsPower(0, 0);
     }
 
-
-    private void rotit (double angle) {
-        if (angle <= 1) {
-            return;
-        }
-    }
-     private void PID_angle (double angle){
+    //nefolosita
+    private void PID_angle (double angle){
 
          //modific unghil momentat cu angle
          //cred ca am pb cand sare la minus sau cacaturi dinastea
 
          double start = gyro.getHeading();
-
          double pGain = 0.3 ;
          double iGain = 0.2;
          double dGain = 0.1;
@@ -347,44 +201,6 @@ public class AutonomousTest extends LinearOpMode {
          mers_right.setPower(0);
      }
 
-     private boolean culoare(){
-        int cul = color.readUnsignedByte(ModernRoboticsI2cColorSensor.Register.COLOR_NUMBER);
-        return (cul == 8);
-     }
-
-     private void simple_walk (double walk){
-
-
-    }
-
-    private void rotit_delicat (double end , double speed){
-        if (speed > 0){
-            speed = 0.3;
-        }
-        else{
-            speed = -0.3;
-        }
-        mers_left.setPower(speed);
-        mers_right.setPower(-speed);
-        while (abs(gyro.getHeading() - end) > 1 && opModeIsActive()){
-            telemetry.addData("angle delicat : " , gyro.getHeading());
-            telemetry.update();
-        }
-        mers_left.setPower(0);
-        mers_right.setPower(0);
-    }
-
-    private void mers (double pasi){
-        double end = range_left.rawUltrasonic() - pasi;
-        double speed = 0.5;
-        if (range_left.rawUltrasonic() - end < 0){
-            speed = -speed;
-        }
-        mers_left.setPower(speed);
-        mers_right.setPower(speed);
-        while (abs(range_left.rawUltrasonic() - end) > 5 && opModeIsActive()){
-=======
-    }
 
     private void rotit(double angle) {
         if (abs(angle) <= 1) {
@@ -406,6 +222,7 @@ public class AutonomousTest extends LinearOpMode {
         rotit_delicat(end, speed);
     }
 
+
     protected void rotit_delicat(double end, double speed) {
         if (speed > 0) {
             speed = 0.2;
@@ -416,14 +233,13 @@ public class AutonomousTest extends LinearOpMode {
         mers_right.setPower(speed);
         while (abs(gyro.getHeading() - end) > 1 && opModeIsActive()) {
             idle();
->>>>>>> postu_enache
         }
         mers_left.setPower(0);
         mers_right.setPower(0);
         mers_delicat(end , speed);
     }
 
-<<<<<<< HEAD
+
     private void mers_delicat (double end , double speed){
         if (speed > 0){
             speed = 0.15;
@@ -441,90 +257,49 @@ public class AutonomousTest extends LinearOpMode {
         mers_right.setPower(0);
     }
 
-    private void mers_cul (){
-        double speed = 0.135;
-        mers_left.setPower(speed);
-        mers_right.setPower(speed);
-        while (color.readUnsignedByte(ModernRoboticsI2cColorSensor.Register.COLOR_NUMBER) == 0){
-        }
-        mers_left.setPower(0);
-        mers_right.setPower(0);
-    }
-
-     private boolean etapa (double angle) {
-        rotit(angle);
-        double start = range_left.rawUltrasonic();
-        mers_cul();
-        double end = range_left.rawUltrasonic();
-        boolean ok = false;
-        if (culoare()) {
-            mers(5);
-            mers(-5);
-            ok = true;
-        }
-        telemetry.addData("start : " , start);
-        telemetry.addData("end : " , end);
-        telemetry.update();
-        mers(end - start);
-        rotit(-angle);
-        return ok;
-     }
-
-     private void mers_culoare() {
-         if (etapa(0)) {
-             return;
-         }
-         /*if (etapa(-20)) {
-             return;
-         }
-         if (etapa(20)) {
-             return;
-         }*/
-     }
-
-
-     private void walk_with_obstacle_and_range(double distanceFromWall, double approxDistance, boolean bHasToBeAllignedWithWall){
+    //incearca sa mentina constanta distanta daca ca parametru fata de orice obiect din fata
+    protected void walk_with_obstacle_and_range(double distanceFromWall, double approxDistance, boolean bHasToBeAllignedWithWall){
          //se aliniaza cu zidul din fata
-         if(bHasToBeAllignedWithWall){
-             while(Math.abs(range_right.rawUltrasonic() - range_left.rawUltrasonic()) < 10/*magic number*/){
-                 //TODO: foloseste PID_angle dupa calcularea unghiului
-                 int dir = (int)Math.signum(range_right.rawUltrasonic() - range_left.rawUltrasonic());
-                 mers_right.setPower(0.2 * dir);
-                 mers_left.setPower(-0.2 * dir);
-             }
-         }
+        if(bHasToBeAllignedWithWall){
+            while(Math.abs(range_right.rawUltrasonic() - range_left.rawUltrasonic()) < 10/*magic number*/){
+                //TODO: foloseste PID_angle dupa calcularea unghiului
+                int dir = (int)Math.signum(range_right.rawUltrasonic() - range_left.rawUltrasonic());
+                mers_right.setPower(0.2 * dir);
+                mers_left.setPower(-0.2 * dir);
+            }
+        }
 
-         final double target = distanceFromWall;
-         final double delay  = 2000;
-         final long period = 10L; //while ce opereaza la frecventa de 10 ms
+        final double target = distanceFromWall;
+        final double delay  = 2000;
+        final long period = 10L; //while ce opereaza la frecventa de 10 ms
 
-         boolean bIsUsingEncoder = false;
+        boolean bIsUsingEncoder = false;
 
-         ///IMPLEMENTARE GYRO
-         gyro.resetZAxisIntegrator();
-         double currentHeading = gyro.getHeading();
+        ///IMPLEMENTARE GYRO
+        gyro.resetZAxisIntegrator();
+        double currentHeading = gyro.getHeading();
 
-         ///TEST**************
-         double iGain = 0.0; //TODO: incearca sa setezi la 0 sa vedem daca se rezolva doar cu PD control
-         double pGain = 1/(target - 5); //daca zidul sau alt robot se apropie mai mult decat trebuie atunci sa mearga la viteza maxima in spate
-         double dGain = 0.0;
+        ///TEST**************
+        double iGain = 0.0; //TODO: incearca sa setezi la 0 sa vedem daca se rezolva doar cu PD control
+        double pGain = 1/(target - 5); //daca zidul sau alt robot se apropie mai mult decat trebuie atunci sa mearga la viteza maxima in spate
+        double dGain = 0.0;
 
-         double errorRight = target - range_right.getDistance(DistanceUnit.CM);
-         double errorLeft = target - range_left.getDistance(DistanceUnit.CM);
+        double errorRight = target - range_right.getDistance(DistanceUnit.CM);
+        double errorLeft = target - range_left.getDistance(DistanceUnit.CM);
 
-         double sumRight = errorRight;
-         double sumLeft = errorLeft;
+        double sumRight = errorRight;
+        double sumLeft = errorLeft;
 
-         double proportionalSpeedLeft = 0;
-         double proportionalSpeedRight = 0;
+        double proportionalSpeedLeft = 0;
+        double proportionalSpeedRight = 0;
 
-         double derivativeSpeedLeft, finalSpeedLeft = 0, derivativeSpeedRight, finalSpeedRight = 0;
+        double derivativeSpeedLeft, finalSpeedLeft = 0, derivativeSpeedRight, finalSpeedRight = 0;
 
-         double auxRight, auxLeft, initValueL = 0, initValueR = 0;
+        double auxRight, auxLeft, initValueL = 0, initValueR = 0;
 
-         float steadyTimer = 0;
+        float steadyTimer = 0;
 
-         while(opModeIsActive() && steadyTimer < delay){
+        while(opModeIsActive() && steadyTimer < delay){
 
              //*****************************
              //conditia de timer
@@ -551,8 +326,8 @@ public class AutonomousTest extends LinearOpMode {
              finalSpeedLeft = -proportionalSpeedLeft;
              finalSpeedRight = -proportionalSpeedRight;
 
-             finalSpeedLeft = Range.clip(finalSpeedLeft, -0.9, 0.9);
-             finalSpeedRight = Range.clip(finalSpeedRight, -0.9, 0.9);
+             finalSpeedLeft = Range.clip(finalSpeedLeft, -0.9, 0.7);
+             finalSpeedRight = Range.clip(finalSpeedRight, -0.9, 0.7);
 
              //****************************
              //exceptii
@@ -614,53 +389,20 @@ public class AutonomousTest extends LinearOpMode {
              telemetry.update();
 
              sleep(period);
-         }
+        }
 
          ///TEST END*****************
-         stopWheels();
-     }
-
-     //TODO: adauga functie de calculare a unghiului in functie de distanta parcursa
-     protected double calculateTurnAngle(double encoderTicks){
-        return Math.atan(DISTANCE_BETWEEN_SLOTS / (encoderTicks / 67));
-     }
-
-
-}
-
-=======
-    /*protected void mers_ultrasonic (double pasi){
-        //cu pasi unde mai multe -> pasi poz se duce in spate , pasi neg in fata
-        double end = range_left.rawUltrasonic() + pasi;
-        double speed = 0.3;
-        if (pasi > 0){
-            speed = -speed;
-        }
-        mers_left.setPower(speed);
-        mers_right.setPower(speed);
-        while (abs(range_left.rawUltrasonic() - end) > 5 && opModeIsActive()){
-        }
-        //mers_left.setPower(0);
-        //mers_right.setPower(0);
-        mers_delicat_ultrasonic(end , speed);
+        stopWheels();
     }
 
-    protected void mers_delicat_ultrasonic (double end , double speed){
-        if (speed > 0){
-            speed = 0.15;
-        }
-        else{
-            speed = -0.15;
-        }
-        mers_left.setPower(speed);
-        mers_right.setPower(speed);
-        while (abs(range_left.rawUltrasonic() - end) > 1 && opModeIsActive()){
-            telemetry.addData("dist delicat : " , range_left.rawUltrasonic());
-            telemetry.update();
-        }
-        mers_left.setPower(0);
-        mers_right.setPower(0);
-    }*/
+    //calculeaza un unghi in functie de tangenta lui
+    protected double calculateTurnAngle(double encoderTicks){
+        if(encoderTicks != 0)
+            return Math.atan(DISTANCE_BETWEEN_SLOTS / (encoderTicks / const_encoder));
+        else
+            return 0;
+    }
+
 
     protected void mers_encoder(int pasi) {
         if (abs(pasi) > 0) {
@@ -680,6 +422,7 @@ public class AutonomousTest extends LinearOpMode {
         mers_right.setPower(0);
     }
 
+
     protected void mers_cul() {
         double speed = 0.2;
         mers_left.setPower(speed);
@@ -691,17 +434,19 @@ public class AutonomousTest extends LinearOpMode {
         mers_right.setPower(0);
     }
 
+
     protected boolean culoare() {
         int cul = color.readUnsignedByte(ModernRoboticsI2cColorSensor.Register.COLOR_NUMBER);
         return (cul == 8 || cul == 9 || cul == 10);
     }
+
 
     private boolean etapa(double angle) {
         rotit(angle);
         int sl = mers_left.getCurrentPosition();
         int sr = mers_right.getCurrentPosition();
         mers_encoder(25);
-        mers_cul();
+        //mers_cul();
         boolean ok = false;
         if (culoare()) {
             mers_encoder(5);
@@ -714,6 +459,7 @@ public class AutonomousTest extends LinearOpMode {
         rotit(-angle);
         return ok;
     }
+
 
     protected void mers_culoare() {
         if (etapa(0)) {
@@ -735,6 +481,49 @@ public class AutonomousTest extends LinearOpMode {
         }
     }
 
-}
+    //functie ce incearca fiecare element in parte si returneaza true daca s-a fasit cubul sau false daca nu s-a gasit nici un cub
+    protected boolean ChooseAndPushCube(){
+        //prima incercare + rotire
+        rotit(calculateTurnAngle(TryObject()));
 
->>>>>>> postu_enache
+        //a doua incercare + rotire
+        if(!bHasFoundCube)
+            rotit(-2 * calculateTurnAngle(TryObject()));
+
+        //ultima incercare
+        if(!bHasFoundCube)
+            TryObject();
+
+        //se roteste inapoi la valoarea 0
+        rotit(-gyro.getHeading());
+
+        if(bHasFoundCube)
+            return true;
+        else
+            return false;
+    }
+
+    //functie care merge in linie dreapta pana gaseste un obiect si il impinge daca este gablen
+    protected double TryObject(){
+        int initPosition = mers_left.getCurrentPosition();
+
+        //merge pana la culoare
+        mers_cul();
+
+        //impinge
+        if (culoare()) {
+            mers_encoder(5);
+            mers_encoder(-5);
+            bHasFoundCube = true;
+        }
+
+        int distMoved = mers_left.getCurrentPosition() - initPosition;
+        mers_encoder(-distMoved);
+
+        //returneaza distanta parcursa
+        if(bHasFoundCube)
+            return 0;
+        else
+            return Math.abs(distMoved);
+    }
+}
