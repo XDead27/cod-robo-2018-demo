@@ -49,6 +49,8 @@ public abstract class AutonomousTest extends LinearOpMode {
     public void runOpMode() {
         initialise();
 
+        waitForStart();
+
         runOp();
 
         endOp();
@@ -112,7 +114,7 @@ public abstract class AutonomousTest extends LinearOpMode {
     }
 
 
-    private void setWheelsPower(double powerleft, double powerright){
+    protected void setWheelsPower(double powerleft, double powerright){
         mers_right.setPower(powerright);
         mers_left.setPower(powerleft);
     }
@@ -147,7 +149,7 @@ public abstract class AutonomousTest extends LinearOpMode {
     }
 
 
-    private void stopWheels(){
+    protected void stopWheels(){
         setWheelsPower(0, 0);
     }
 
@@ -202,7 +204,7 @@ public abstract class AutonomousTest extends LinearOpMode {
      }
 
 
-    private void rotit(double angle) {
+    protected void rotit(double angle) {
         if (abs(angle) <= 1) {
             return;
         }
@@ -210,13 +212,15 @@ public abstract class AutonomousTest extends LinearOpMode {
         while (end < 0) {
             end += 360;
         }
-        double speed = 0.6;
+        double speed = 0.4;
         if (angle < 0) {
             speed = -speed;
         }
         mers_left.setPower(-speed);
         mers_right.setPower(speed);
         while (abs(gyro.getHeading() - end) > 5 && opModeIsActive()) {
+            telemetry.addData("gyro ", gyro.getHeading());
+            //telemetry.update();
             idle();
         }
         rotit_delicat(end, speed);
@@ -225,18 +229,20 @@ public abstract class AutonomousTest extends LinearOpMode {
 
     protected void rotit_delicat(double end, double speed) {
         if (speed > 0) {
-            speed = 0.2;
+            speed = 0.15;
         } else {
-            speed = -0.2;
+            speed = -0.15;
         }
         mers_left.setPower(-speed);
         mers_right.setPower(speed);
         while (abs(gyro.getHeading() - end) > 1 && opModeIsActive()) {
+            telemetry.addData("gyro ", gyro.getHeading());
+            //telemetry.update();
             idle();
         }
         mers_left.setPower(0);
         mers_right.setPower(0);
-        mers_delicat(end , speed);
+        //mers_delicat(end , speed);
     }
 
 
@@ -250,15 +256,14 @@ public abstract class AutonomousTest extends LinearOpMode {
         mers_left.setPower(speed);
         mers_right.setPower(speed);
         while (abs(range_left.rawUltrasonic() - end) > 1 && opModeIsActive()){
-            telemetry.addData("dist delicat : " , range_left.rawUltrasonic());
-            telemetry.update();
+            idle();
         }
         mers_left.setPower(0);
         mers_right.setPower(0);
     }
 
     //incearca sa mentina constanta distanta daca ca parametru fata de orice obiect din fata
-    protected void walk_with_obstacle_and_range(double distanceFromWall, double approxDistance, boolean bHasToBeAllignedWithWall){
+    protected void walk_with_obstacle_and_range(double distanceFromWall, boolean bHasToBeAllignedWithWall){
          //se aliniaza cu zidul din fata
         if(bHasToBeAllignedWithWall){
             while(Math.abs(range_right.rawUltrasonic() - range_left.rawUltrasonic()) < 10/*magic number*/){
@@ -395,10 +400,72 @@ public abstract class AutonomousTest extends LinearOpMode {
         stopWheels();
     }
 
+    protected void walk_with_single_PID(double distanceFromWall){
+        final double target = distanceFromWall;
+        final double delay  = 2000;
+        final long period = 10L; //while ce opereaza la frecventa de 10 ms
+
+        ///TEST**************
+        double iGain = 0.0; //TODO: incearca sa setezi la 0 sa vedem daca se rezolva doar cu PD control
+        double pGain = 1/(target - 5); //daca zidul sau alt robot se apropie mai mult decat trebuie atunci sa mearga la viteza maxima in spate
+        double dGain = 0.0;
+
+        double ShortestDistanceToWall = Math.min(range_left.getDistance(DistanceUnit.CM), range_right.getDistance(DistanceUnit.CM));
+
+        double error = target - ShortestDistanceToWall;
+
+        double  finalSpeed = 0;
+
+        float steadyTimer = 0;
+
+        while(opModeIsActive() && steadyTimer < delay){
+
+            //*****************************
+            //conditia de timer
+            if (Math.abs(error) < 2) {
+                steadyTimer += period;
+            } else {
+                steadyTimer = 0;
+            }
+
+
+            //****************************
+            //PID
+
+            ShortestDistanceToWall = Math.min(range_left.getDistance(DistanceUnit.CM), range_right.getDistance(DistanceUnit.CM));
+            error = target - ShortestDistanceToWall;
+
+            finalSpeed = error * pGain;
+
+            //inversam viteza ca sa fie pozitiva
+            finalSpeed = -finalSpeed;
+
+            finalSpeed = Range.clip(finalSpeed, -0.9, 0.7);
+
+            //****************************
+            //exceptii
+            if(Math.abs(finalSpeed) < TOLERANCE ){
+                finalSpeed = 0;
+            }
+
+            setWheelsPower(finalSpeed, finalSpeed);
+
+            sleep(period);
+        }
+
+        ///TEST END*****************
+        stopWheels();
+    }
+
     //calculeaza un unghi in functie de tangenta lui
     protected double calculateTurnAngle(double encoderTicks){
+
+        telemetry.addData("degrees ", (360 * Math.atan(DISTANCE_BETWEEN_SLOTS / ((encoderTicks / const_encoder) + 23)) )/ (2 * Math.PI));
+        telemetry.addData("radians ", Math.atan(DISTANCE_BETWEEN_SLOTS / (encoderTicks / const_encoder)));
+        telemetry.update();
+
         if(encoderTicks != 0)
-            return Math.atan(DISTANCE_BETWEEN_SLOTS / (encoderTicks / const_encoder));
+            return (360 * Math.atan(DISTANCE_BETWEEN_SLOTS / ((encoderTicks / const_encoder) + 23)) )/ (2 * Math.PI);
         else
             return 0;
     }
@@ -413,7 +480,7 @@ public abstract class AutonomousTest extends LinearOpMode {
         mers_left.setPower(0.7);
         mers_right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         mers_right.setPower(0.7);
-        while (mers_left.isBusy() || mers_right.isBusy()) {
+        while ((mers_left.isBusy() || mers_right.isBusy()) && opModeIsActive()) {
             idle();
         }
         mers_left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -424,6 +491,9 @@ public abstract class AutonomousTest extends LinearOpMode {
 
 
     protected void mers_cul() {
+
+        mers_encoder(19);
+
         double speed = 0.2;
         mers_left.setPower(speed);
         mers_right.setPower(speed);
@@ -482,28 +552,32 @@ public abstract class AutonomousTest extends LinearOpMode {
     }
 
     //functie ce incearca fiecare element in parte si returneaza true daca s-a fasit cubul sau false daca nu s-a gasit nici un cub
-    protected boolean ChooseAndPushCube(){
+    protected int ChooseAndPushCube(){
+
+        double unghiDeRotit = calculateTurnAngle(TryObject());
+
         //prima incercare + rotire
-        rotit(calculateTurnAngle(TryObject()));
+        rotit(unghiDeRotit);
 
         //a doua incercare + rotire
-        if(!bHasFoundCube)
-            rotit(-2 * calculateTurnAngle(TryObject()));
+        if(!bHasFoundCube) {
+            TryObject();
+            rotit(-2 * unghiDeRotit);
+        }else {
+            return 1;
+        }
 
         //ultima incercare
-        if(!bHasFoundCube)
+        if(!bHasFoundCube) {
             TryObject();
+        }else {
+            return 2;
+        }
 
-        //se roteste inapoi la valoarea 0
-        rotit(-gyro.getHeading());
-
-        if(bHasFoundCube)
-            return true;
-        else
-            return false;
+        return 3;
     }
 
-    //functie care merge in linie dreapta pana gaseste un obiect si il impinge daca este gablen
+    //functie care merge in linie dreapta pana gaseste un obiect si il impinge daca este galben
     protected double TryObject(){
         int initPosition = mers_left.getCurrentPosition();
 
@@ -512,18 +586,29 @@ public abstract class AutonomousTest extends LinearOpMode {
 
         //impinge
         if (culoare()) {
-            mers_encoder(5);
-            mers_encoder(-5);
+            mers_encoder(7);
+            mers_encoder(-7);
             bHasFoundCube = true;
         }
 
         int distMoved = mers_left.getCurrentPosition() - initPosition;
-        mers_encoder(-distMoved);
+
+        if(!bHasFoundCube)
+            mers_encoder(-(distMoved/const_encoder));
 
         //returneaza distanta parcursa
         if(bHasFoundCube)
             return 0;
         else
             return Math.abs(distMoved);
+    }
+
+    protected void PlopTotem(){
+        ridicare_perii.setPower(0.5);
+        sleep(700);
+        ridicare_perii.setPower(0);
+        rotire_perii.setPower(-0.9);
+        sleep(1000);
+        rotire_perii.setPower(0);
     }
 }
