@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 @Autonomous(name = "Autonomous_Patrat_Inamic", group = "Autonomous")
 
-public abstract class AutonomousPatratInamic extends AutonomousMode {
+public final class AutonomousPatratInamic extends AutonomousMode {
 
     @Override
     public void runOpMode() {

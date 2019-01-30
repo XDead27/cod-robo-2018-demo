@@ -200,13 +200,13 @@ public abstract class AutonomousMode extends LinearOpMode {
             mers_right.setPower(0);
             return;
         }
-        //sleep(300);
+        sleep(300);
         if (etapa(-28 , simplu)) {
             mers_left.setPower(0);
             mers_right.setPower(0);
             return;
         }
-        //sleep(300);
+        sleep(300);
         if (etapa(28 , simplu)) {
             mers_left.setPower(0);
             mers_right.setPower(0);
@@ -224,14 +224,14 @@ public abstract class AutonomousMode extends LinearOpMode {
     }
 
     protected void optimizare(){
-        //rotit -90
+        //rotit -60
         //mers pana la perete
-        //rotit -45
+        //rotit -70
         //mers cu spatele pana pe crater
 
-        rotit(-90);
+        rotit(-60);
         mers_perete();
-        rotit(-45);
+        rotit(-70);
         mers_crater(-1);
     }
 

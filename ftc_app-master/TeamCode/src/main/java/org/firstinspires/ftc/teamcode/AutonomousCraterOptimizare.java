@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 @Autonomous(name = "Autonomous_Crater_Optimizare", group = "Autonomous")
 
-public abstract class AutonomousCraterOptimizare extends AutonomousMode {
+public final class AutonomousCraterOptimizare extends AutonomousMode {
 
     @Override
     public void runOpMode() {
