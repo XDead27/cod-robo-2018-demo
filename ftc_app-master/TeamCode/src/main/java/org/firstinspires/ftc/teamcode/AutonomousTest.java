@@ -36,7 +36,6 @@ public abstract class AutonomousTest extends LinearOpMode {
     private ModernRoboticsI2cColorSensor color = null;
 
     //constante
-    int cnst = 1000;
     protected static double TOLERANCE = 0.0001;
     protected static double DISTANCE_BETWEEN_SLOTS = 30;
     final int const_sleep = 1000;
@@ -44,6 +43,7 @@ public abstract class AutonomousTest extends LinearOpMode {
 
     //misc
     boolean bHasFoundCube;
+    boolean mers_mult = false;
 
     @Override
     public void runOpMode() {
@@ -153,57 +153,6 @@ public abstract class AutonomousTest extends LinearOpMode {
         setWheelsPower(0, 0);
     }
 
-    //nefolosita
-    private void PID_angle (double angle){
-
-         //modific unghil momentat cu angle
-         //cred ca am pb cand sare la minus sau cacaturi dinastea
-
-         double start = gyro.getHeading();
-         double pGain = 0.3 ;
-         double iGain = 0.2;
-         double dGain = 0.1;
-
-         double error = angle;
-         double sum = angle;
-
-         while (error > 1 || error < 1){
-             double now = gyro.getHeading();
-             if (now > 180){
-                 now -= 360;
-                 telemetry.addLine("sa imi bag pula");
-                 break;
-             }
-             double last = error;
-             error = angle - abs(now - start);
-             sum += error;
-             double derivata = error - last;
-
-             double speed = (error * pGain) + (sum * iGain) + (derivata * dGain);
-
-             telemetry.addData("speed : ", speed );
-             telemetry.addData("error : ", error );
-             telemetry.addData("unghi : ", now );
-             telemetry.update();
-
-             double absolut = abs(speed);
-             absolut = Range.clip(speed, -0.5, 0.5);
-             if (speed < 0){
-                 speed = -absolut;
-             }
-             else{
-                 speed = absolut;
-             }
-
-             mers_left.setPower(speed);
-             mers_right.setPower(-speed);
-         }
-
-         mers_left.setPower(0);
-         mers_right.setPower(0);
-     }
-
-
     protected void rotit(double angle) {
         if (abs(angle) <= 1) {
             return;
@@ -212,7 +161,7 @@ public abstract class AutonomousTest extends LinearOpMode {
         while (end < 0) {
             end += 360;
         }
-        double speed = 0.4;
+        double speed = 0.6;
         if (angle < 0) {
             speed = -speed;
         }
@@ -229,9 +178,9 @@ public abstract class AutonomousTest extends LinearOpMode {
 
     protected void rotit_delicat(double end, double speed) {
         if (speed > 0) {
-            speed = 0.15;
+            speed = 0.2;
         } else {
-            speed = -0.15;
+            speed = -0.2;
         }
         mers_left.setPower(-speed);
         mers_right.setPower(speed);
@@ -243,23 +192,6 @@ public abstract class AutonomousTest extends LinearOpMode {
         mers_left.setPower(0);
         mers_right.setPower(0);
         //mers_delicat(end , speed);
-    }
-
-
-    private void mers_delicat (double end , double speed){
-        if (speed > 0){
-            speed = 0.15;
-        }
-        else{
-            speed = -0.15;
-        }
-        mers_left.setPower(speed);
-        mers_right.setPower(speed);
-        while (abs(range_left.rawUltrasonic() - end) > 1 && opModeIsActive()){
-            idle();
-        }
-        mers_left.setPower(0);
-        mers_right.setPower(0);
     }
 
     //incearca sa mentina constanta distanta daca ca parametru fata de orice obiect din fata
@@ -400,6 +332,27 @@ public abstract class AutonomousTest extends LinearOpMode {
         stopWheels();
     }
 
+    protected void mers_perete (){
+        double speed = 0.6;
+        mers_left.setPower(speed);
+        mers_right.setPower(speed);
+        while (range_left.getDistance(DistanceUnit.CM) > 7 && range_right.getDistance(DistanceUnit.CM) > 7 && opModeIsActive()){
+            idle();
+        }
+        mers_delicat_perete();
+    }
+
+    protected void mers_delicat_perete (){
+        double speed = 0.2;
+        mers_left.setPower(speed);
+        mers_right.setPower(speed);
+        while (range_left.getDistance(DistanceUnit.CM) > 1 && range_right.getDistance(DistanceUnit.CM) > 1 && opModeIsActive()){
+            idle();
+        }
+        mers_left.setPower(0);
+        mers_right.setPower(0);
+    }
+
     protected void walk_with_single_PID(double distanceFromWall){
         final double target = distanceFromWall;
         final double delay  = 2000;
@@ -489,9 +442,12 @@ public abstract class AutonomousTest extends LinearOpMode {
 
 
     protected void mers_cul() {
-
-        mers_encoder(19, 0.7);
-
+        if (mers_mult){
+            mers_encoder(32 , 0.8);
+        }
+        else{
+            mers_encoder(25 , 0.8);
+        }
         double speed = 0.2;
         mers_left.setPower(speed);
         mers_right.setPower(speed);
@@ -552,13 +508,17 @@ public abstract class AutonomousTest extends LinearOpMode {
     //functie ce incearca fiecare element in parte si returneaza true daca s-a fasit cubul sau false daca nu s-a gasit nici un cub
     protected int ChooseAndPushCube(boolean returnToInitialPosition){
 
-        double unghiDeRotit = calculateTurnAngle(TryObject(returnToInitialPosition));
+        //prima incercare + calcul unghi
+        //am mai adaugat o variabila ca sa putem hardcoda daca nu merge trigo
+        double unghiCuTrigo = calculateTurnAngle(TryObject(returnToInitialPosition));
+        double unghiDeRotit = unghiCuTrigo;
 
-        //prima incercare + rotire
-        rotit(unghiDeRotit);
+        mers_mult = true;
+
 
         //a doua incercare + rotire
         if(!bHasFoundCube) {
+            rotit(unghiDeRotit);
             TryObject(returnToInitialPosition);
             rotit(-2 * unghiDeRotit);
         }else {
@@ -585,6 +545,7 @@ public abstract class AutonomousTest extends LinearOpMode {
         int initPosition = mers_left.getCurrentPosition();
 
         //merge pana la culoare
+
         mers_cul();
 
         //impinge
@@ -606,13 +567,14 @@ public abstract class AutonomousTest extends LinearOpMode {
             return Math.abs(distMoved);
     }
 
-    protected void PlopTotem(){
-        ridicare_cutie_encoder(10 , 0.5);
-        ridicare_cutie_encoder(-10 , 0.2);
+    protected void ThrowTotem(){
+        ridicare_perii_encoder(-10 , 0.2);
 
         rotire_perii.setPower(0.5);
         sleep(700);
         rotire_perii.setPower(0);
+
+        ridicare_perii_encoder(10 , 0.5);
     }
 
     protected void optimizare(){
@@ -622,13 +584,14 @@ public abstract class AutonomousTest extends LinearOpMode {
         //mers cu spatele pana pe crater
 
         rotit(-60);
-        walk_with_single_PID(1);
+        //walk_with_single_PID(1);
+        mers_perete();
         rotit(-70);
         mers_encoder(-60 , 0.7);
         //mers_crater(-1);
     }
 
-    protected void ridicare_cutie_encoder(int pasi , double speed) {
+    protected void ridicare_perii_encoder(int pasi , double speed) {
         ridicare_perii.setTargetPosition(ridicare_cutie.getCurrentPosition() + pasi * const_encoder);
         ridicare_perii.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         ridicare_perii.setPower(speed);

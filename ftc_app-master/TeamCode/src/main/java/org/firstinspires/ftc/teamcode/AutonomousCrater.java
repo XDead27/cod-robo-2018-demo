@@ -1,4 +1,4 @@
-/*package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
@@ -14,7 +14,7 @@ public class AutonomousCrater extends AutonomousTest {
     protected void runOp() {
         ChooseAndPushCube(true);
 
-        sleep(1000);
+        //sleep(1000);
 
         optimizare();
         //aici va faceti de cap baieti cu functiile din AutonomousTest
@@ -23,6 +23,6 @@ public class AutonomousCrater extends AutonomousTest {
     @Override
     protected void endOp() {
         //extindem mecanismele cumva
-        ridicare_cutie_encoder(10, 0.3);
+        ridicare_perii_encoder(-10, 0.2);
     }
-}*/
+}

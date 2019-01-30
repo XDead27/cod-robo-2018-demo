@@ -1,4 +1,4 @@
-/*package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
@@ -12,7 +12,7 @@ public final class AutonomousSquare extends AutonomousTest {
             case 1:
                 mers_encoder(25, 0.7);
 
-                PlopTotem();
+                ThrowTotem();
 
                 rotit(90);
 
@@ -24,7 +24,7 @@ public final class AutonomousSquare extends AutonomousTest {
 
                 rotit(-90);
 
-                PlopTotem();
+                ThrowTotem();
 
                 rotit(180);
                 break;
@@ -34,7 +34,7 @@ public final class AutonomousSquare extends AutonomousTest {
 
                 rotit(90);
 
-                PlopTotem();
+                ThrowTotem();
 
                 rotit(180);
 
@@ -53,4 +53,3 @@ public final class AutonomousSquare extends AutonomousTest {
         //extindem mecanismele cumva
     }
 }
-*/
