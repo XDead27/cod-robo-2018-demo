@@ -52,16 +52,16 @@ public abstract class AutonomousTest extends AutonomousMode {
         }
 
         if (test_mers_encoder) {
-            mers_encoder(50 * const_encoder);
+            mers_encoder(50 * const_encoder , 0.7);
             sleep(3 * const_sleep);
 
-            mers_encoder(-100 * const_encoder);
+            mers_encoder(-100 * const_encoder ,0.7);
             sleep(3 * const_sleep);
 
-            mers_encoder(30 * const_encoder);
+            mers_encoder(30 * const_encoder , 0.7);
             sleep(3 * const_sleep);
 
-            mers_encoder(-70 * const_encoder);
+            mers_encoder(-70 * const_encoder , 0.7);
         }
 
         if (test_gasit_cub) {
