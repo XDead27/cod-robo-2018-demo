@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+/*package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
@@ -8,9 +8,9 @@ public final class AutonomousSquare extends AutonomousTest {
     @Override
     protected void runOp() {
         //aici va faceti de cap baieti cu functiile din AutonomousTest
-        switch(ChooseAndPushCube()){
+        switch(ChooseAndPushCube(false)){
             case 1:
-                mers_encoder(25);
+                mers_encoder(25, 0.7);
 
                 PlopTotem();
 
@@ -53,3 +53,4 @@ public final class AutonomousSquare extends AutonomousTest {
         //extindem mecanismele cumva
     }
 }
+*/

@@ -460,10 +460,6 @@ public abstract class AutonomousTest extends LinearOpMode {
     //calculeaza un unghi in functie de tangenta lui
     protected double calculateTurnAngle(double encoderTicks){
 
-        telemetry.addData("degrees ", (360 * Math.atan(DISTANCE_BETWEEN_SLOTS / ((encoderTicks / const_encoder) + 23)) )/ (2 * Math.PI));
-        telemetry.addData("radians ", Math.atan(DISTANCE_BETWEEN_SLOTS / (encoderTicks / const_encoder)));
-        telemetry.update();
-
         if(encoderTicks != 0)
             return (360 * Math.atan(DISTANCE_BETWEEN_SLOTS / ((encoderTicks / const_encoder) + 23)) )/ (2 * Math.PI);
         else
@@ -471,15 +467,17 @@ public abstract class AutonomousTest extends LinearOpMode {
     }
 
 
-    protected void mers_encoder(int pasi) {
+    protected void mers_encoder(int pasi, double speed) {
+        speed = Math.abs(speed);
+
         if (abs(pasi) > 0) {
             mers_left.setTargetPosition(mers_left.getCurrentPosition() + pasi * const_encoder);
             mers_right.setTargetPosition(mers_right.getCurrentPosition() + pasi * const_encoder);
         }
         mers_left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        mers_left.setPower(0.7);
+        mers_left.setPower(speed);
         mers_right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        mers_right.setPower(0.7);
+        mers_right.setPower(speed);
         while ((mers_left.isBusy() || mers_right.isBusy()) && opModeIsActive()) {
             idle();
         }
@@ -492,7 +490,7 @@ public abstract class AutonomousTest extends LinearOpMode {
 
     protected void mers_cul() {
 
-        mers_encoder(19);
+        mers_encoder(19, 0.7);
 
         double speed = 0.2;
         mers_left.setPower(speed);
@@ -511,7 +509,7 @@ public abstract class AutonomousTest extends LinearOpMode {
     }
 
 
-    private boolean etapa(double angle) {
+    /*private boolean etapa(double angle) {
         rotit(angle);
         int sl = mers_left.getCurrentPosition();
         int sr = mers_right.getCurrentPosition();
@@ -549,19 +547,19 @@ public abstract class AutonomousTest extends LinearOpMode {
             mers_right.setPower(0);
             return;
         }
-    }
+    }*/
 
     //functie ce incearca fiecare element in parte si returneaza true daca s-a fasit cubul sau false daca nu s-a gasit nici un cub
-    protected int ChooseAndPushCube(){
+    protected int ChooseAndPushCube(boolean returnToInitialPosition){
 
-        double unghiDeRotit = calculateTurnAngle(TryObject());
+        double unghiDeRotit = calculateTurnAngle(TryObject(returnToInitialPosition));
 
         //prima incercare + rotire
         rotit(unghiDeRotit);
 
         //a doua incercare + rotire
         if(!bHasFoundCube) {
-            TryObject();
+            TryObject(returnToInitialPosition);
             rotit(-2 * unghiDeRotit);
         }else {
             return 1;
@@ -569,16 +567,21 @@ public abstract class AutonomousTest extends LinearOpMode {
 
         //ultima incercare
         if(!bHasFoundCube) {
-            TryObject();
+            TryObject(returnToInitialPosition);
         }else {
+            if(returnToInitialPosition)
+                rotit(-gyro.getHeading());
             return 2;
         }
+
+        if(returnToInitialPosition)
+            rotit(-gyro.getHeading());
 
         return 3;
     }
 
     //functie care merge in linie dreapta pana gaseste un obiect si il impinge daca este galben
-    protected double TryObject(){
+    protected double TryObject(boolean returnToInitialPosition){
         int initPosition = mers_left.getCurrentPosition();
 
         //merge pana la culoare
@@ -586,15 +589,15 @@ public abstract class AutonomousTest extends LinearOpMode {
 
         //impinge
         if (culoare()) {
-            mers_encoder(7);
-            mers_encoder(-7);
+            mers_encoder(7, 0.7);
+            mers_encoder(-7, 0.7);
             bHasFoundCube = true;
         }
 
         int distMoved = mers_left.getCurrentPosition() - initPosition;
 
-        if(!bHasFoundCube)
-            mers_encoder(-(distMoved/const_encoder));
+        if(!bHasFoundCube || returnToInitialPosition)
+            mers_encoder(-(distMoved/const_encoder), 0.7);
 
         //returneaza distanta parcursa
         if(bHasFoundCube)
@@ -604,11 +607,36 @@ public abstract class AutonomousTest extends LinearOpMode {
     }
 
     protected void PlopTotem(){
-        ridicare_perii.setPower(0.5);
+        ridicare_cutie_encoder(10 , 0.5);
+        ridicare_cutie_encoder(-10 , 0.2);
+
+        rotire_perii.setPower(0.5);
         sleep(700);
-        ridicare_perii.setPower(0);
-        rotire_perii.setPower(-0.9);
-        sleep(1000);
         rotire_perii.setPower(0);
     }
+
+    protected void optimizare(){
+        //rotit -60
+        //mers pana la perete
+        //rotit -70
+        //mers cu spatele pana pe crater
+
+        rotit(-60);
+        walk_with_single_PID(1);
+        rotit(-70);
+        mers_encoder(-60 , 0.7);
+        //mers_crater(-1);
+    }
+
+    protected void ridicare_cutie_encoder(int pasi , double speed) {
+        ridicare_perii.setTargetPosition(ridicare_cutie.getCurrentPosition() + pasi * const_encoder);
+        ridicare_perii.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        ridicare_perii.setPower(speed);
+        while (ridicare_perii.isBusy()  && opModeIsActive()) {
+            idle();
+        }
+        ridicare_perii.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        ridicare_perii.setPower(0);
+    }
+
 }
