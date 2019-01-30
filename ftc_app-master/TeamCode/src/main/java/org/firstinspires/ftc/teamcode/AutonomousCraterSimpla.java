@@ -13,7 +13,7 @@ public final class AutonomousCraterSimpla extends AutonomousMode {
 
         waitForStart();
 
-        gasit_cub(true);
+        gasit_cub(1);
     }
 
 }

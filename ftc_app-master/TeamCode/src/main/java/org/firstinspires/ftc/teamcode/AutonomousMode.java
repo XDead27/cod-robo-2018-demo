@@ -132,16 +132,16 @@ public abstract class AutonomousMode extends LinearOpMode {
         mers_right.setPower(0);
     }
 
-    protected void mers_encoder(int pasi) {
+    protected void mers_encoder(int pasi , double speed) {
         if (abs(pasi) > 0) {
             mers_left.setTargetPosition(mers_left.getCurrentPosition() + pasi * const_encoder);
             mers_right.setTargetPosition(mers_right.getCurrentPosition() + pasi * const_encoder);
         }
         mers_left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        mers_left.setPower(0.7);
+        mers_left.setPower(speed);
         mers_right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        mers_right.setPower(0.7);
-        while (mers_left.isBusy() || mers_right.isBusy()) {
+        mers_right.setPower(speed);
+        while (mers_left.isBusy() || mers_right.isBusy() && opModeIsActive()) {
             idle();
         }
         mers_left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -166,62 +166,63 @@ public abstract class AutonomousMode extends LinearOpMode {
         return (cul == 8 || cul == 9 || cul == 10);
     }
 
-    protected boolean etapa(double angle , boolean simplu) {
+    protected boolean etapa(double angle , int tip) {
         rotit(angle);
         int sl = mers_left.getCurrentPosition();
         int sr = mers_right.getCurrentPosition();
         if (angle != 0){
-            mers_encoder(30);
+            mers_encoder(30 , 0.7);
         }
         else{
-            mers_encoder(25);
+            mers_encoder(25 , 0.7);
         }
         mers_pana_la_cul();
         boolean ok = false;
         if (culoare()) {
-            if (simplu){
-                mers_crater(1);
+            if (tip == 1){
+                //mers_crater(1);
+                mers_encoder(20 , 0.7);
                 return true;
             }
-            mers_encoder(5);
-            mers_encoder(-5);
+            if (tip == 2){
+                mers_encoder(10 , 0.7);
+                rotit(-angle*1.5);
+                lasat_mascota();
+                return true;
+            }
+            mers_encoder(5 , 0.7);
+            mers_encoder(-5 , 0.7);
             ok = true;
         }
         mers_left.setTargetPosition(sl);
         mers_right.setTargetPosition(sr);
-        mers_encoder(0);
+        mers_encoder(0 , 0.7);
         rotit(-angle);
         return ok;
     }
 
-    protected void gasit_cub(boolean simplu) {
-        if (etapa(0 , simplu)) {
-            mers_left.setPower(0);
-            mers_right.setPower(0);
+    protected void gasit_cub(int tip) {
+        if (etapa(0 , tip)) {
             return;
         }
         sleep(300);
-        if (etapa(-28 , simplu)) {
-            mers_left.setPower(0);
-            mers_right.setPower(0);
+        if (etapa(-28 , tip)) {
             return;
         }
         sleep(300);
-        if (etapa(28 , simplu)) {
-            mers_left.setPower(0);
-            mers_right.setPower(0);
+        if (etapa(28 , tip)) {
             return;
         }
     }
 
-    protected void mers_crater(double dir){
+    /*protected void mers_crater(double dir){
         double speed = 0.5 * dir;
         mers_left.setPower(speed);
         mers_right.setPower(speed);
         while (opModeIsActive()){
             idle();
         }
-    }
+    }*/
 
     protected void optimizare(){
         //rotit -60
@@ -232,37 +233,25 @@ public abstract class AutonomousMode extends LinearOpMode {
         rotit(-60);
         mers_perete();
         rotit(-70);
-        mers_crater(-1);
+        mers_encoder(-60 , 0.7);
+        //mers_crater(-1);
     }
 
-    protected void ridicare_perii_encoder(int pasi) {
-        ridicare_perii.setTargetPosition(ridicare_perii.getCurrentPosition() + pasi * const_encoder);
-        ridicare_perii.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        ridicare_perii.setPower(0.3);
-        while (ridicare_perii.isBusy()) {
+    protected void ridicare_cutie_encoder(int pasi , double speed) {
+        ridicare_cutie.setTargetPosition(ridicare_cutie.getCurrentPosition() + pasi * const_encoder);
+        ridicare_cutie.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        ridicare_cutie.setPower(speed);
+        while (ridicare_cutie.isBusy()  && opModeIsActive()) {
             idle();
         }
-        ridicare_perii.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        ridicare_perii.setPower(0);
-    }
-
-    protected void rotire_perii_encoder(int pasi) {
-        rotire_perii.setTargetPosition(rotire_perii.getCurrentPosition() + pasi * const_encoder);
-        rotire_perii.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rotire_perii.setPower(0.3);
-        while (rotire_perii.isBusy()) {
-            idle();
-        }
-        rotire_perii.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rotire_perii.setPower(0);
+        ridicare_cutie.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        ridicare_cutie.setPower(0);
     }
 
 
     protected void lasat_mascota(){
-        mers_encoder(30);
-        ridicare_perii_encoder(10);
-        rotire_perii_encoder(10);
-        ridicare_perii_encoder(-10);
+        ridicare_cutie_encoder(10 , 0.5);
+        ridicare_cutie_encoder(-10 , 0.2);
     }
 
 }

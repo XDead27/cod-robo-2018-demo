@@ -13,7 +13,7 @@ public final class AutonomousCraterOptimizare extends AutonomousMode {
 
         waitForStart();
 
-        gasit_cub(false);
+        gasit_cub(0);
         optimizare();
     }
 

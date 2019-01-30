@@ -13,7 +13,8 @@ public final class AutonomousPatratAliat extends AutonomousMode {
 
         waitForStart();
 
-        lasat_mascota();
+        gasit_cub(2);
+
     }
 
 }

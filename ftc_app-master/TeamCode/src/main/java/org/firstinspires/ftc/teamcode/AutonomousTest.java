@@ -65,7 +65,7 @@ public abstract class AutonomousTest extends AutonomousMode {
         }
 
         if (test_gasit_cub) {
-            gasit_cub(false);
+            gasit_cub(0);
         }
 
         if (test_optimizare){
