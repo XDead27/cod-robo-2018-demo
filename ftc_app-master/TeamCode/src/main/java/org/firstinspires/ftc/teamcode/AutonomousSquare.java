@@ -9,18 +9,27 @@ public final class AutonomousSquare extends AutonomousTest {
     protected void runOp() {
         //aici va faceti de cap baieti cu functiile din AutonomousTest
         switch(ChooseAndPushCube(false)){
+            //TODO: scoate sleep urile
             case 1:
+                sleep(1000);
+
                 mers_encoder(25, 0.7);
 
                 ThrowTotem();
 
                 rotit(90);
 
-                walk_with_obstacle_and_range(10, false);
+                walk_with_obstacle_and_range(15, false);
+
+                rotit(90);
                 break;
 
             case 2:
-                walk_with_obstacle_and_range(10, false);
+                sleep(1000);
+
+                rotit(30);
+
+                walk_with_obstacle_and_range(20, false);
 
                 rotit(-90);
 
@@ -30,7 +39,9 @@ public final class AutonomousSquare extends AutonomousTest {
                 break;
 
             case 3:
-                walk_with_obstacle_and_range(10, false);
+                sleep(1000);
+
+                walk_with_obstacle_and_range(15, false);
 
                 rotit(90);
 

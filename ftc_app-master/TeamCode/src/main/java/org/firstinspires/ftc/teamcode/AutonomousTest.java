@@ -169,7 +169,7 @@ public abstract class AutonomousTest extends LinearOpMode {
         mers_right.setPower(speed);
         while (abs(gyro.getHeading() - end) > 5 && opModeIsActive()) {
             telemetry.addData("gyro ", gyro.getHeading());
-            //telemetry.update();
+            telemetry.update();
             idle();
         }
         rotit_delicat(end, speed);
@@ -355,7 +355,7 @@ public abstract class AutonomousTest extends LinearOpMode {
 
     protected void walk_with_single_PID(double distanceFromWall){
         final double target = distanceFromWall;
-        final double delay  = 2000;
+        final double delay  = 1000;
         final long period = 10L; //while ce opereaza la frecventa de 10 ms
 
         ///TEST**************
@@ -515,7 +515,6 @@ public abstract class AutonomousTest extends LinearOpMode {
 
         mers_mult = true;
 
-
         //a doua incercare + rotire
         if(!bHasFoundCube) {
             rotit(unghiDeRotit);
@@ -530,12 +529,12 @@ public abstract class AutonomousTest extends LinearOpMode {
             TryObject(returnToInitialPosition);
         }else {
             if(returnToInitialPosition)
-                rotit(-gyro.getHeading());
+                rotit(-unghiDeRotit);
             return 2;
         }
 
         if(returnToInitialPosition)
-            rotit(-gyro.getHeading());
+            rotit(unghiDeRotit);
 
         return 3;
     }
@@ -584,8 +583,8 @@ public abstract class AutonomousTest extends LinearOpMode {
         //mers cu spatele pana pe crater
 
         rotit(-60);
-        //walk_with_single_PID(1);
-        mers_perete();
+        walk_with_single_PID(1);
+        //mers_perete();
         rotit(-70);
         mers_encoder(-60 , 0.7);
         //mers_crater(-1);
