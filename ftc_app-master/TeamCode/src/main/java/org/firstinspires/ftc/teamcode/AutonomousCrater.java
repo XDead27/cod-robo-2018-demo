@@ -3,12 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 @Autonomous(name = "Autonomie Crater", group = "Autonomie")
-public class AutonomousCrater extends AutonomousTest {
-
-    @Override
-    public void runOpMode() {
-        super.runOpMode();
-    }
+public final class AutonomousCrater extends AutonomousTest {
 
     @Override
     protected void runOp() {

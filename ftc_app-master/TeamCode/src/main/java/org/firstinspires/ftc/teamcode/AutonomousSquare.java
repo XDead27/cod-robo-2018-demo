@@ -11,6 +11,10 @@ public final class AutonomousSquare extends AutonomousTest {
         switch(ChooseAndPushCube(false)){
             //TODO: scoate sleep urile
             case 1:
+                //cub este in fata
+                //se duce in craterul inamic
+                //TODO : sa nu dea in mingie
+
                 sleep(1000);
 
                 mers_encoder(25, 0.7);
@@ -25,6 +29,9 @@ public final class AutonomousSquare extends AutonomousTest {
                 break;
 
             case 2:
+                //cub este in stanga
+                //se duce in crater inamic
+
                 sleep(1000);
 
                 rotit(30);
@@ -39,6 +46,9 @@ public final class AutonomousSquare extends AutonomousTest {
                 break;
 
             case 3:
+                //cub este in dreapta
+                //se duce in crater aliat
+
                 sleep(1000);
 
                 walk_with_obstacle_and_range(15, false);

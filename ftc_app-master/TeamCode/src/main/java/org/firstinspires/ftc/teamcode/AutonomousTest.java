@@ -30,20 +30,20 @@ public abstract class AutonomousTest extends LinearOpMode {
     protected DcMotor rotire_perii = null;
 
     //senzori
-    private ModernRoboticsI2cGyro gyro = null;
-    private ModernRoboticsI2cRangeSensor range_right = null;
-    private ModernRoboticsI2cRangeSensor range_left = null;
-    private ModernRoboticsI2cColorSensor color = null;
+    protected ModernRoboticsI2cGyro gyro = null;
+    protected ModernRoboticsI2cRangeSensor range_right = null;
+    protected ModernRoboticsI2cRangeSensor range_left = null;
+    protected ModernRoboticsI2cColorSensor color = null;
 
     //constante
     protected static double TOLERANCE = 0.0001;
     protected static double DISTANCE_BETWEEN_SLOTS = 30;
-    final int const_sleep = 1000;
-    final int const_encoder = 67;
+    protected final int const_sleep = 1000;
+    protected final int const_encoder = 67;
 
     //misc
-    boolean bHasFoundCube;
-    boolean mers_mult = false;
+    protected boolean bHasFoundCube;
+    protected boolean mers_mult = false;
 
     @Override
     public void runOpMode() {
