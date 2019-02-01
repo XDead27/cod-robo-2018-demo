@@ -121,54 +121,31 @@ public abstract class AutonomousTest extends LinearOpMode {
 
     //nefolosita
     private void setWheelsPowerWithGyro(double powerleft, double powerright){
-
-        // reseteaza axa z a gyro-ului
-        gyro.resetZAxisIntegrator();
-
-        // PID stuff
-        double pGain = 0.003;
-        double iGain = 0.002;
-        double dGain = 0.001;
-
-        int error = gyro.getHeading();
-        int errorSum = 0;
-        int errorLast = 0;
-        double speed = 0;
-        double derivata = 0;
-
-        if (error > 180)
-        {
-            error -= 360;
-            error = Math.abs(error);
+        // TODO adauga o variabila pentru a seta gradul la care se considera devierea
+        // TODO daca trece peste 90 de grade sa se apeleze functia rotate ??
+        // o ia la STANGA
+        if (gyro.getHeading() > 270 && gyro.getHeading() <= 300) {
+            mers_right.setPower(powerright - 0.4);
         }
-
-        while (error > 3) // TODO determina unghiul maxim permis
-        {
-            error = gyro.getHeading();
-
-            if (error > 180)
-            {
-                error -= 360;
-                error = Math.abs(error);
-            }
-
-            errorSum += error;
-            derivata = errorLast - error;
-
-            speed = pGain * error + iGain * errorSum + dGain * derivata;
-
-            errorLast = error;
-
-            if (gyro.getHeading() > 180)
-            {
-                setWheelsPower(powerleft + speed, powerright);
-            }
-            if (gyro.getHeading() < 180)
-            {
-                setWheelsPower(powerleft, powerright + speed);
-            }
+        if (gyro.getHeading() > 300 && gyro.getHeading() <= 330) {
+            mers_right.setPower(powerright - 0.3);
         }
-
+        if (gyro.getHeading() > 330 && gyro.getHeading() <= 359) {
+            mers_right.setPower(powerright - 0.2);
+        }
+        // o ia la DREAPTA
+        if (gyro.getHeading() < 90 && gyro.getHeading() >= 60) {
+            mers_left.setPower(powerright - 0.4);
+        }
+        if (gyro.getHeading() < 60 && gyro.getHeading() >= 30) {
+            mers_left.setPower(powerright - 0.3);
+        }
+        if (gyro.getHeading() < 30 && gyro.getHeading() >= 1) {
+            mers_left.setPower(powerright - 0.2);
+        }
+        if (gyro.getHeading() == 0) {
+            setWheelsPower(powerleft, powerright);
+        }
     }
 
 
