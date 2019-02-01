@@ -38,6 +38,8 @@ public class DriverMode extends LinearOpMode
     //private ModernRoboticsI2cRangeSensor range_left = null;
     //private ModernRoboticsI2cColorSensor color = null;
 
+    private final double deadzone = 0.1;
+
     @Override
     public void runOpMode()
     {
@@ -107,9 +109,18 @@ public class DriverMode extends LinearOpMode
         else if ( gamepad2.dpad_down ) ridicare_cutie.setPower(-0.5);
         else ridicare_cutie.setPower(0);
 
-        if ( gamepad2.a ) ridicare_perii.setPower(-0.4);
+        if(Math.abs(gamepad2.left_trigger) > deadzone)
+            ridicare_perii.setPower(gamepad2.left_trigger/3);
+        else
+            ridicare_perii.setPower(0);
+
+        if(Math.abs(gamepad2.right_trigger) > deadzone)
+            ridicare_perii.setPower(-gamepad2.right_trigger/3);
+        else
+            ridicare_perii.setPower(0);
+        /*if ( gamepad2.a ) ridicare_perii.setPower(-0.4);
         else if ( gamepad2.b ) ridicare_perii.setPower(0.4);
-        else ridicare_perii.setPower(0);
+        else ridicare_perii.setPower(0);*/
 
         if ( gamepad2.left_bumper ) rotire_perii.setPower(-0.4);
         else if ( gamepad2.right_bumper ) rotire_perii.setPower(0.4);
