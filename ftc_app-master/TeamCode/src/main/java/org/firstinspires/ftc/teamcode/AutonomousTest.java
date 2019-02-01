@@ -196,7 +196,7 @@ public abstract class AutonomousTest extends LinearOpMode {
 
     //incearca sa mentina constanta distanta daca ca parametru fata de orice obiect din fata
     protected void walk_with_obstacle_and_range(double distanceFromWall, boolean bHasToBeAllignedWithWall){
-         //se aliniaza cu zidul din fata
+        //se aliniaza cu zidul din fata
         if(bHasToBeAllignedWithWall){
             while(Math.abs(range_right.rawUltrasonic() - range_left.rawUltrasonic()) < 10/*magic number*/){
                 //TODO: foloseste PID_angle dupa calcularea unghiului
@@ -238,97 +238,97 @@ public abstract class AutonomousTest extends LinearOpMode {
 
         while(opModeIsActive() && steadyTimer < delay){
 
-             //*****************************
-             //conditia de timer
-             if (Math.abs(errorLeft) < 2 || Math.abs(errorRight) < 2) {
-                 steadyTimer += period;
-             } else {
-                 steadyTimer = 0;
-             }
+            //*****************************
+            //conditia de timer
+            if (Math.abs(errorLeft) < 2 || Math.abs(errorRight) < 2) {
+                steadyTimer += period;
+            } else {
+                steadyTimer = 0;
+            }
 
 
-             //****************************
-             //PID
-             auxRight = finalSpeedRight;
-             auxLeft = finalSpeedLeft;
-             errorRight = target - range_right.getDistance(DistanceUnit.CM);
-             errorLeft = target - range_left.getDistance(DistanceUnit.CM);
-             sumRight += errorRight;
-             sumLeft += errorLeft;
+            //****************************
+            //PID
+            auxRight = finalSpeedRight;
+            auxLeft = finalSpeedLeft;
+            errorRight = target - range_right.getDistance(DistanceUnit.CM);
+            errorLeft = target - range_left.getDistance(DistanceUnit.CM);
+            sumRight += errorRight;
+            sumLeft += errorLeft;
 
-             proportionalSpeedRight = (errorRight * pGain);
-             proportionalSpeedLeft = (errorLeft * pGain);
+            proportionalSpeedRight = (errorRight * pGain);
+            proportionalSpeedLeft = (errorLeft * pGain);
 
-             //inversam viteza ca sa fie pozitiva
-             finalSpeedLeft = -proportionalSpeedLeft;
-             finalSpeedRight = -proportionalSpeedRight;
+            //inversam viteza ca sa fie pozitiva
+            finalSpeedLeft = -proportionalSpeedLeft;
+            finalSpeedRight = -proportionalSpeedRight;
 
-             finalSpeedLeft = Range.clip(finalSpeedLeft, -0.9, 0.7);
-             finalSpeedRight = Range.clip(finalSpeedRight, -0.9, 0.7);
+            finalSpeedLeft = Range.clip(finalSpeedLeft, -0.9, 0.7);
+            finalSpeedRight = Range.clip(finalSpeedRight, -0.9, 0.7);
 
-             //****************************
-             //exceptii
-             if(Math.abs(finalSpeedLeft) < TOLERANCE ){
+            //****************************
+            //exceptii
+            if(Math.abs(finalSpeedLeft) < TOLERANCE ){
                 finalSpeedLeft = 0;
-             }
-             if(Math.abs(finalSpeedRight) < TOLERANCE ){
-                 finalSpeedRight = 0;
-             }
+            }
+            if(Math.abs(finalSpeedRight) < TOLERANCE ){
+                finalSpeedRight = 0;
+            }
 
-             //daca robotul trebuie sa se intoarca
-             if(finalSpeedLeft > 0 && finalSpeedRight < 0){
-                 finalSpeedLeft = 0;
-             }
-             if(finalSpeedRight > 0 && finalSpeedLeft < 0){
-                 finalSpeedRight = 0;
-             }
+            //daca robotul trebuie sa se intoarca
+            if(finalSpeedLeft > 0 && finalSpeedRight < 0){
+                finalSpeedLeft = 0;
+            }
+            if(finalSpeedRight > 0 && finalSpeedLeft < 0){
+                finalSpeedRight = 0;
+            }
 
-             //****************************
-             //gyro
-             currentHeading = gyro.getHeading();
-             if(currentHeading > 180){
-                 currentHeading = currentHeading - 360;
-             }
-             if(Math.abs(currentHeading) > 2 && !bIsUsingEncoder){
-                 bIsUsingEncoder = true;
-                 initValueL = mers_left.getCurrentPosition();
-                 initValueR = mers_right.getCurrentPosition();
-             }
+            //****************************
+            //gyro
+            currentHeading = gyro.getHeading();
+            if(currentHeading > 180){
+                currentHeading = currentHeading - 360;
+            }
+            if(Math.abs(currentHeading) > 2 && !bIsUsingEncoder){
+                bIsUsingEncoder = true;
+                initValueL = mers_left.getCurrentPosition();
+                initValueR = mers_right.getCurrentPosition();
+            }
 
-             //****************************
-             //retrack
-             if(bIsUsingEncoder){
-                 if(initValueL <= mers_left.getCurrentPosition()){
-                     finalSpeedLeft = 0;
-                 }
-                 if(initValueR <= mers_right.getCurrentPosition()){
-                     finalSpeedRight = 0;
-                 }
+            //****************************
+            //retrack
+            if(bIsUsingEncoder){
+                if(initValueL <= mers_left.getCurrentPosition()){
+                    finalSpeedLeft = 0;
+                }
+                if(initValueR <= mers_right.getCurrentPosition()){
+                    finalSpeedRight = 0;
+                }
 
-                 if(initValueL < mers_left.getCurrentPosition() && initValueR < mers_right.getCurrentPosition()){
-                     bIsUsingEncoder = false;
-                     gyro.resetZAxisIntegrator();
-                 }
-             }
+                if(initValueL < mers_left.getCurrentPosition() && initValueR < mers_right.getCurrentPosition()){
+                    bIsUsingEncoder = false;
+                    gyro.resetZAxisIntegrator();
+                }
+            }
 
-             setWheelsPower(finalSpeedLeft,finalSpeedRight);
+            setWheelsPower(finalSpeedLeft,finalSpeedRight);
 
-             telemetry.addData("using encoder ", bIsUsingEncoder);
+            telemetry.addData("using encoder ", bIsUsingEncoder);
 
-             //telemetry.addData("desired ", -proportionalSpeedRight);
+            //telemetry.addData("desired ", -proportionalSpeedRight);
 
-             telemetry.addData("speed left", finalSpeedLeft);
-             telemetry.addData("speed right", finalSpeedRight);
+            telemetry.addData("speed left", finalSpeedLeft);
+            telemetry.addData("speed right", finalSpeedRight);
 
-             telemetry.addData("error left ", errorLeft);
-             telemetry.addData("error right ", errorRight);
-             telemetry.addData("steady timer ", steadyTimer);
-             telemetry.update();
+            telemetry.addData("error left ", errorLeft);
+            telemetry.addData("error right ", errorRight);
+            telemetry.addData("steady timer ", steadyTimer);
+            telemetry.update();
 
-             sleep(period);
+            sleep(period);
         }
 
-         ///TEST END*****************
+        ///TEST END*****************
         stopWheels();
     }
 
@@ -517,9 +517,14 @@ public abstract class AutonomousTest extends LinearOpMode {
 
         //a doua incercare + rotire
         if(!bHasFoundCube) {
-            rotit(unghiDeRotit);
+            rotit(-unghiDeRotit);
             TryObject(returnToInitialPosition);
-            rotit(-2 * unghiDeRotit);
+            if (bHasFoundCube){
+                rotit(unghiDeRotit);
+            }
+            else{
+                rotit(2 * unghiDeRotit);
+            }
         }else {
             return 1;
         }
@@ -528,13 +533,10 @@ public abstract class AutonomousTest extends LinearOpMode {
         if(!bHasFoundCube) {
             TryObject(returnToInitialPosition);
         }else {
-            if(returnToInitialPosition)
-                rotit(-unghiDeRotit);
             return 2;
         }
 
-        if(returnToInitialPosition)
-            rotit(unghiDeRotit);
+        rotit(unghiDeRotit);
 
         return 3;
     }
@@ -557,7 +559,7 @@ public abstract class AutonomousTest extends LinearOpMode {
         int distMoved = mers_left.getCurrentPosition() - initPosition;
 
         if(!bHasFoundCube || returnToInitialPosition)
-            mers_encoder(-(distMoved/const_encoder), 0.7);
+            mers_encoder(-distMoved, 0.7);
 
         //returneaza distanta parcursa
         if(bHasFoundCube)

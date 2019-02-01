@@ -39,6 +39,7 @@ public class DriverMode extends LinearOpMode
     //private ModernRoboticsI2cColorSensor color = null;
 
     private final double deadzone = 0.1;
+    private final int max_glisare = 100 * 67;
 
     @Override
     public void runOpMode()
@@ -87,6 +88,9 @@ public class DriverMode extends LinearOpMode
         ridicare_perii.setDirection(DcMotorSimple.Direction.FORWARD);
         rotire_perii.setDirection(DcMotorSimple.Direction.FORWARD);
 
+        //setat encodere
+        glisare.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         //calibreat gyro
         //gyro.calibrate();
 
@@ -105,17 +109,17 @@ public class DriverMode extends LinearOpMode
 
     private void secondGamepad()
     {
-        if ( gamepad2.dpad_up ) ridicare_cutie.setPower(0.5);
-        else if ( gamepad2.dpad_down ) ridicare_cutie.setPower(-0.5);
+        if ( gamepad2.dpad_up ) ridicare_cutie.setPower(0.6);
+        else if ( gamepad2.dpad_down ) ridicare_cutie.setPower(-0.3);
         else ridicare_cutie.setPower(0);
 
         if(Math.abs(gamepad2.left_trigger) > deadzone)
-            ridicare_perii.setPower(gamepad2.left_trigger/3);
+            ridicare_perii.setPower(0.6);
         else
             ridicare_perii.setPower(0);
 
         if(Math.abs(gamepad2.right_trigger) > deadzone)
-            ridicare_perii.setPower(-gamepad2.right_trigger/3);
+            ridicare_perii.setPower(-0.3);
         else
             ridicare_perii.setPower(0);
         /*if ( gamepad2.a ) ridicare_perii.setPower(-0.4);
@@ -126,7 +130,16 @@ public class DriverMode extends LinearOpMode
         else if ( gamepad2.right_bumper ) rotire_perii.setPower(0.4);
         else rotire_perii.setPower(0);
 
-        if (abs(gamepad2.left_stick_y) > 0.1) glisare.setPower(Range.clip(gamepad2.left_stick_y, -0.9, 0.9));
+        if (gamepad2.left_stick_y > deadzone && glisare.getCurrentPosition() < max_glisare) {
+            glisare.setPower(0.5);
+            telemetry.addData ("dist : " ,  glisare.getCurrentPosition());
+            telemetry.update();
+        }
+        else if (gamepad2.left_stick_y < -deadzone && glisare.getCurrentPosition() > 0) {
+            glisare.setPower(-0.5);
+            telemetry.addData ("dist : " ,  glisare.getCurrentPosition());
+            telemetry.update();
+        }
         else glisare.setPower(0);
-     }
+    }
 }
