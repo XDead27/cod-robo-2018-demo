@@ -12,7 +12,7 @@ import static java.lang.Math.abs;
 
 @Autonomous(name = "Autonomous_Test", group = "Autonomous")
 
-public abstract class AutonomousTest extends AutonomousMode {
+public final class AutonomousTest extends AutonomousMode {
 
     @Override
     public void runOpMode() {
@@ -20,7 +20,7 @@ public abstract class AutonomousTest extends AutonomousMode {
 
         waitForStart();
 
-        boolean test_senz = false;
+        boolean test_senz = true;
         boolean test_rotit = false;
         boolean test_mers_encoder = false;
         boolean test_gasit_cub = false;
@@ -28,7 +28,7 @@ public abstract class AutonomousTest extends AutonomousMode {
 
         if (test_senz) {
             while (opModeIsActive()) {
-                telemetry.addData("distanta dreapta : ", range_right.rawUltrasonic());
+                //telemetry.addData("distanta dreapta : ", range_right.rawUltrasonic());
                 telemetry.addData("distanta stanga : ", range_left.rawUltrasonic());
                 telemetry.addData("culoare : ", color.readUnsignedByte(ModernRoboticsI2cColorSensor.Register.COLOR_NUMBER));
                 telemetry.addData("calibrat : ", gyro.isCalibrating());

@@ -13,7 +13,7 @@ public final class AutonomousPatratInamic extends AutonomousMode {
 
         waitForStart();
 
-        lasat_mascota();
+        gasit_cub(2);
     }
 
 }

@@ -24,7 +24,7 @@ public abstract class AutonomousMode extends LinearOpMode {
 
     //senzori
     protected ModernRoboticsI2cGyro gyro = null;
-    protected ModernRoboticsI2cRangeSensor range_right = null;
+    //protected ModernRoboticsI2cRangeSensor range_right = null;
     protected ModernRoboticsI2cRangeSensor range_left = null;
     protected ModernRoboticsI2cColorSensor color = null;
 
@@ -44,7 +44,7 @@ public abstract class AutonomousMode extends LinearOpMode {
         //gyro = hardwareMap.gyroSensor.get("gyro");
         gyro = hardwareMap.get(ModernRoboticsI2cGyro.class, "gyro");
         range_left = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "range_left");
-        range_right = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "range_right");
+        //range_right = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "range_right");
         color = hardwareMap.get(ModernRoboticsI2cColorSensor.class, "color");
 
         //setare puteri la 0
@@ -56,8 +56,8 @@ public abstract class AutonomousMode extends LinearOpMode {
         rotire_perii.setPower(0);
 
         //setare directii
-        mers_left.setDirection(DcMotorSimple.Direction.FORWARD);
-        mers_right.setDirection(DcMotorSimple.Direction.FORWARD);
+        mers_left.setDirection(DcMotorSimple.Direction.FORWARD); //?
+        mers_right.setDirection(DcMotorSimple.Direction.FORWARD); //?
         glisare.setDirection(DcMotorSimple.Direction.FORWARD);
         ridicare_cutie.setDirection(DcMotorSimple.Direction.FORWARD);
         ridicare_perii.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -115,7 +115,7 @@ public abstract class AutonomousMode extends LinearOpMode {
         double speed = 0.6;
         mers_left.setPower(speed);
         mers_right.setPower(speed);
-        while (range_left.getDistance(DistanceUnit.CM) > 7 && range_right.getDistance(DistanceUnit.CM) > 7 && opModeIsActive()){
+        while (range_left.getDistance(DistanceUnit.CM) > 7 /*&& range_right.getDistance(DistanceUnit.CM) > 7*/ && opModeIsActive()){
             idle();
         }
         mers_delicat_perete();
@@ -125,7 +125,7 @@ public abstract class AutonomousMode extends LinearOpMode {
         double speed = 0.2;
         mers_left.setPower(speed);
         mers_right.setPower(speed);
-        while (range_left.getDistance(DistanceUnit.CM) > 1 && range_right.getDistance(DistanceUnit.CM) > 1 && opModeIsActive()){
+        while (range_left.getDistance(DistanceUnit.CM) > 1 /*&& range_right.getDistance(DistanceUnit.CM) > 1*/ && opModeIsActive()){
             idle();
         }
         mers_left.setPower(0);
@@ -237,7 +237,7 @@ public abstract class AutonomousMode extends LinearOpMode {
         //mers_crater(-1);
     }
 
-    protected void ridicare_cutie_encoder(int pasi , double speed) {
+    /*protected void ridicare_cutie_encoder(int pasi , double speed) {
         ridicare_cutie.setTargetPosition(ridicare_cutie.getCurrentPosition() + pasi * const_encoder);
         ridicare_cutie.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         ridicare_cutie.setPower(speed);
@@ -246,12 +246,34 @@ public abstract class AutonomousMode extends LinearOpMode {
         }
         ridicare_cutie.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         ridicare_cutie.setPower(0);
+    }*/
+
+    protected void ridicare_perii_encoder(int pasi , double speed) {
+        ridicare_perii.setTargetPosition(ridicare_perii.getCurrentPosition() + pasi * const_encoder);
+        ridicare_perii.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        ridicare_perii.setPower(speed);
+        while (ridicare_perii.isBusy()  && opModeIsActive()) {
+            idle();
+        }
+        ridicare_perii.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        ridicare_perii.setPower(0);
     }
 
+    protected void rotire_perii_encoder(int pasi , double speed) {
+        rotire_perii.setTargetPosition(rotire_perii.getCurrentPosition() + pasi * const_encoder);
+        rotire_perii.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rotire_perii.setPower(speed);
+        while (rotire_perii.isBusy()  && opModeIsActive()) {
+            idle();
+        }
+        rotire_perii.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rotire_perii.setPower(0);
+    }
 
     protected void lasat_mascota(){
-        ridicare_cutie_encoder(10 , 0.5);
-        ridicare_cutie_encoder(-10 , 0.2);
+        ridicare_perii_encoder(-10 , 0.3);
+        rotire_perii_encoder(-10 , 0.5);
+        ridicare_perii_encoder(10 , 0.6);
     }
 
 }
