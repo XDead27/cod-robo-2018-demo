@@ -84,6 +84,9 @@ public abstract class AutonomousMode extends LinearOpMode {
         while (end < 0) {
             end += 360;
         }
+        while (end > 360) {
+            end -= 360;
+        }
         double speed = 0.6;
         if (angle < 0) {
             speed = -speed;
@@ -154,7 +157,8 @@ public abstract class AutonomousMode extends LinearOpMode {
         double speed = 0.2;
         mers_left.setPower(speed);
         mers_right.setPower(speed);
-        while (color.readUnsignedByte(ModernRoboticsI2cColorSensor.Register.COLOR_NUMBER) == 0 && opModeIsActive()) {
+        int sl = mers_left.getCurrentPosition();
+        while (color.readUnsignedByte(ModernRoboticsI2cColorSensor.Register.COLOR_NUMBER) == 0 && opModeIsActive() && mers_left.getCurrentPosition() - sl < 15 * const_encoder) {
             idle();
         }
         mers_left.setPower(0);
@@ -167,6 +171,13 @@ public abstract class AutonomousMode extends LinearOpMode {
     }
 
     protected boolean etapa(double angle , int tip) {
+        int semn = -1;
+        if (angle < 0){
+            semn = 1;
+        }
+        else if (angle == 0){
+            semn = 0;
+        }
         rotit(angle);
         int sl = mers_left.getCurrentPosition();
         int sr = mers_right.getCurrentPosition();
@@ -174,19 +185,22 @@ public abstract class AutonomousMode extends LinearOpMode {
             mers_encoder(30 , 0.7);
         }
         else{
-            mers_encoder(25 , 0.7);
+            mers_encoder(19 , 0.7);
         }
         mers_pana_la_cul();
         boolean ok = false;
         if (culoare()) {
             if (tip == 1){
                 //mers_crater(1);
-                mers_encoder(20 , 0.7);
+                mers_encoder(100 , 0.7);
                 return true;
             }
             if (tip == 2){
                 mers_encoder(10 , 0.7);
-                rotit(-angle*1.5);
+                sleep(500);
+                rotit(-angle + 15*semn);
+                sleep(500);
+                mers_encoder(20 , 0.7);
                 lasat_mascota();
                 return true;
             }
@@ -205,13 +219,22 @@ public abstract class AutonomousMode extends LinearOpMode {
         if (etapa(0 , tip)) {
             return;
         }
-        sleep(300);
-        if (etapa(-28 , tip)) {
+        mers_left.setPower(0);
+        mers_right.setPower(0);
+        if (etapa(-30 , tip)) {
             return;
         }
-        sleep(300);
-        if (etapa(28 , tip)) {
+        mers_left.setPower(0);
+        mers_right.setPower(0);
+        if (etapa(37 , tip)) {
             return;
+        }
+        if (tip == 2){
+            mers_encoder(40 , 0.7);
+            lasat_mascota();
+        }
+        if (tip == 1){
+            mers_encoder(100 , 0.7);
         }
     }
 
@@ -248,32 +271,22 @@ public abstract class AutonomousMode extends LinearOpMode {
         ridicare_cutie.setPower(0);
     }*/
 
-    protected void ridicare_perii_encoder(int pasi , double speed) {
-        ridicare_perii.setTargetPosition(ridicare_perii.getCurrentPosition() + pasi * const_encoder);
-        ridicare_perii.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    protected void ridicare_perii_timp(int timp , double speed) {
         ridicare_perii.setPower(speed);
-        while (ridicare_perii.isBusy()  && opModeIsActive()) {
-            idle();
-        }
-        ridicare_perii.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        sleep(timp * const_sleep);
         ridicare_perii.setPower(0);
     }
 
-    protected void rotire_perii_encoder(int pasi , double speed) {
-        rotire_perii.setTargetPosition(rotire_perii.getCurrentPosition() + pasi * const_encoder);
-        rotire_perii.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    protected void rotire_perii_timp(int timp , double speed) {
         rotire_perii.setPower(speed);
-        while (rotire_perii.isBusy()  && opModeIsActive()) {
-            idle();
-        }
-        rotire_perii.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        sleep(timp * const_sleep);
         rotire_perii.setPower(0);
     }
 
     protected void lasat_mascota(){
-        ridicare_perii_encoder(-10 , 0.3);
-        rotire_perii_encoder(-10 , 0.5);
-        ridicare_perii_encoder(10 , 0.6);
+        ridicare_perii_timp(1 , -0.2);
+        rotire_perii_timp(2 , 0.6);
+        ridicare_perii_timp(1 , 0.5);
     }
 
 }

@@ -113,18 +113,9 @@ public class DriverMode extends LinearOpMode
         else if ( gamepad2.dpad_down ) ridicare_cutie.setPower(-0.3);
         else ridicare_cutie.setPower(0);
 
-        if(Math.abs(gamepad2.left_trigger) > deadzone)
-            ridicare_perii.setPower(0.6);
-        else
-            ridicare_perii.setPower(0);
-
-        if(Math.abs(gamepad2.right_trigger) > deadzone)
-            ridicare_perii.setPower(-0.3);
-        else
-            ridicare_perii.setPower(0);
-        /*if ( gamepad2.a ) ridicare_perii.setPower(-0.4);
-        else if ( gamepad2.b ) ridicare_perii.setPower(0.4);
-        else ridicare_perii.setPower(0);*/
+        if ( gamepad2.a ) ridicare_perii.setPower(-0.3);
+        else if ( gamepad2.b ) ridicare_perii.setPower(0.6);
+        else ridicare_perii.setPower(0);
 
         if ( gamepad2.left_bumper ) rotire_perii.setPower(-0.4);
         else if ( gamepad2.right_bumper ) rotire_perii.setPower(0.4);

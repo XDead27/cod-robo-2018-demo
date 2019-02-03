@@ -20,11 +20,12 @@ public final class AutonomousTest extends AutonomousMode {
 
         waitForStart();
 
-        boolean test_senz = true;
+        boolean test_senz = false;
         boolean test_rotit = false;
         boolean test_mers_encoder = false;
         boolean test_gasit_cub = false;
         boolean test_optimizare = false;
+        boolean test_lasat_mascota = true;
 
         if (test_senz) {
             while (opModeIsActive()) {
@@ -70,6 +71,10 @@ public final class AutonomousTest extends AutonomousMode {
 
         if (test_optimizare){
             optimizare();
+        }
+
+        if (test_lasat_mascota){
+            lasat_mascota();
         }
     }
 }
