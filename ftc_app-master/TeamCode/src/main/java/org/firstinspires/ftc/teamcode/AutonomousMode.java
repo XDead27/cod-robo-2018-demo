@@ -30,6 +30,10 @@ public abstract class AutonomousMode extends LinearOpMode {
 
     protected final int const_sleep = 1000;
     protected final int const_encoder = 67;
+    protected final double ROBOT_LENGHT = 46;
+    protected final double DISTANCE_BETWEEN_OBJECTS = 27;
+    protected double encoderTicks = 0;
+
 
     protected void initialise() {
         //mapare
@@ -208,6 +212,9 @@ public abstract class AutonomousMode extends LinearOpMode {
             mers_encoder(-5 , 0.7);
             ok = true;
         }
+        if (angle == 0){
+            encoderTicks = abs(mers_left.getCurrentPosition() - sl);
+        }
         mers_left.setTargetPosition(sl);
         mers_right.setTargetPosition(sr);
         mers_encoder(0 , 0.7);
@@ -215,19 +222,28 @@ public abstract class AutonomousMode extends LinearOpMode {
         return ok;
     }
 
+    protected double calculateTurnAngle(){
+
+        if(encoderTicks != 0)
+            return Math.toDegrees(Math.atan(DISTANCE_BETWEEN_OBJECTS / ((encoderTicks / 67.0) + ROBOT_LENGHT / 2.0)));
+        else
+            return 0;
+    }
+
     protected void gasit_cub(int tip) {
         //TODO unghi cu trigo, nu hardcodat, cu functia lui dani
         if (etapa(0 , tip)) {
             return;
         }
+        double angle = calculateTurnAngle();
         mers_left.setPower(0);
         mers_right.setPower(0);
-        if (etapa(-30 , tip)) {
+        if (etapa(-angle , tip)) {
             return;
         }
         mers_left.setPower(0);
         mers_right.setPower(0);
-        if (etapa(37 , tip)) {
+        if (etapa(angle , tip)) {
             return;
         }
         if (tip == 2){
