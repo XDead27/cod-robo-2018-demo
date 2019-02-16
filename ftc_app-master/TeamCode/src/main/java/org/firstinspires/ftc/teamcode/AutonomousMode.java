@@ -56,8 +56,8 @@ public abstract class AutonomousMode extends LinearOpMode {
         rotire_perii.setPower(0);
 
         //setare directii
-        mers_left.setDirection(DcMotorSimple.Direction.FORWARD); //?
-        mers_right.setDirection(DcMotorSimple.Direction.FORWARD); //?
+        mers_left.setDirection(DcMotorSimple.Direction.FORWARD); //TODO ?
+        mers_right.setDirection(DcMotorSimple.Direction.FORWARD); //TODO ?
         glisare.setDirection(DcMotorSimple.Direction.FORWARD);
         ridicare_cutie.setDirection(DcMotorSimple.Direction.FORWARD);
         ridicare_perii.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -167,7 +167,7 @@ public abstract class AutonomousMode extends LinearOpMode {
 
     protected boolean culoare() {
         int cul = color.readUnsignedByte(ModernRoboticsI2cColorSensor.Register.COLOR_NUMBER);
-        return (cul == 8 || cul == 9 || cul == 10);
+        return (cul >= 8 &&  cul <= 10);
     }
 
     protected boolean etapa(double angle , int tip) {
@@ -216,6 +216,7 @@ public abstract class AutonomousMode extends LinearOpMode {
     }
 
     protected void gasit_cub(int tip) {
+        //TODO unghi cu trigo, nu hardcodat, cu functia lui dani
         if (etapa(0 , tip)) {
             return;
         }

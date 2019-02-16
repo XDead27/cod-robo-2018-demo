@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+//import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.SensorMRGyro;
@@ -14,11 +15,8 @@ import org.firstinspires.ftc.robotcontroller.external.samples.SensorMRRangeSenso
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import static java.lang.Math.abs;
-import static java.lang.Math.max;
-import static java.lang.Math.min;
 
-
-@TeleOp (name = "DriverMode_Test", group = "Driver")
+@TeleOp (name = "DriverMode", group = "Driver")
 
 public class DriverMode extends LinearOpMode
 {
@@ -31,12 +29,9 @@ public class DriverMode extends LinearOpMode
     private DcMotor ridicare_perii = null;
     private DcMotor rotire_perii = null;
 
-    //senzori
-    //private GyroSensor gyro = null;
-    //private ModernRoboticsI2cGyro gyro = null;
-    //private ModernRoboticsI2cRangeSensor range_right = null;
-    //private ModernRoboticsI2cRangeSensor range_left = null;
-    //private ModernRoboticsI2cColorSensor color = null;
+    //servos
+    //private Servo servo_L = null;
+    //private Servo servo_R = null;
 
     private final double deadzone = 0.1;
     //private final int max_glisare = 100 * 67;
@@ -65,6 +60,10 @@ public class DriverMode extends LinearOpMode
         ridicare_perii = hardwareMap.dcMotor.get("ridicare_perii");
         rotire_perii = hardwareMap.dcMotor.get("rotire_perii");
 
+        //servo
+        //servo_L = hardwareMap.servo.get("servo_L");
+        //servo_R = hardwareMap.servo.get("servo_R");
+
         //senzori
         //gyro = hardwareMap.gyroSensor.get("gyro");
         //gyro = hardwareMap.get(ModernRoboticsI2cGyro.class ,"gyro");
@@ -81,8 +80,8 @@ public class DriverMode extends LinearOpMode
         rotire_perii.setPower(0);
 
         //setare directii
-        mers_left.setDirection(DcMotorSimple.Direction.REVERSE); //?
-        mers_right.setDirection(DcMotorSimple.Direction.REVERSE); //?
+        mers_left.setDirection(DcMotorSimple.Direction.REVERSE); //TODO ?
+        mers_right.setDirection(DcMotorSimple.Direction.REVERSE); //TODO ?
         glisare.setDirection(DcMotorSimple.Direction.FORWARD);
         ridicare_cutie.setDirection(DcMotorSimple.Direction.FORWARD);
         ridicare_perii.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -91,11 +90,6 @@ public class DriverMode extends LinearOpMode
         //setat encodere
         glisare.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        //calibreat gyro
-        //gyro.calibrate();
-
-        //senzor de culoare
-        //color.enableLed(true); //daca ma uit la un : obiect - true ; lumina - false
     }
 
     private void firstGamepad()
@@ -132,5 +126,14 @@ public class DriverMode extends LinearOpMode
             //telemetry.update();
         }
         else glisare.setPower(0);
+
+       /* if (gamepad2.x) {
+            servo_L.setPosition(0);
+            servo_R.setPosition(1.0);
+        }
+        else if (gamepad2.y) {
+            servo_L.setPosition(1.0);
+            servo_R.setPosition(0);
+        }*/
     }
 }
