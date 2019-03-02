@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoController;
 
+
+@TeleOp(name = "Driver Servo Test", group = "Driver")
 public class DriverServoTest extends LinearOpMode {
 
     private Servo ServoL = null;
@@ -32,6 +35,7 @@ public class DriverServoTest extends LinearOpMode {
                 ServoL.setPosition(Servo.MIN_POSITION);
                 ServoR.setPosition(Servo.MIN_POSITION);
             }
+
         }
 
 
